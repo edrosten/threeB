@@ -33,6 +33,12 @@ threebdir=threeB-$autoproj
 threebversion=${threebdir}.tar.gz
 downloaddir=$PWD/build-downloads/
 
+
+echo "Starting 3B build"
+echo "Building verson $threebdir"
+
+echo "Creating tar ball..."
+
 #######################
 #
 # Now create a tar gz file. 
@@ -47,7 +53,7 @@ echo "Version: $threebdir" >> "$threebdir/jar/about.txt"
 echo "git hash: $git_hash" >> "$threebdir/jar/about.txt"
 
 
-git archive --prefix $threebdir $git_hash | tar -uf- "$threebdir/jar/about.txt" | gzip -9 > $threebversion
+git archive --prefix $threebdir $git_hash | tar -rf - "$threebdir/jar/about.txt" | gzip -9 > $threebversion
 
 
 exit 
