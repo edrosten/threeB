@@ -53,7 +53,7 @@ echo "Version: $threebdir" >> "$threebdir/jar/about.txt"
 echo "git hash: $git_hash" >> "$threebdir/jar/about.txt"
 
 
-git archive --prefix $threebdir $git_hash  > $threebdir.tar
+git archive --prefix $threebdir/ $git_hash  > $threebdir.tar
 tar -rf $threebdir.tar "$threebdir/jar/about.txt" 
 gzip -9 $threebdir.tar
 
