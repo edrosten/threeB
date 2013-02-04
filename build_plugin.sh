@@ -11,7 +11,7 @@ then
 fi
 
 
-doxyproj=`grep PROJECT_NUMBER Doxyfile | awk '{print $3}'`
+doxyproj=`awk '$1=="PROJECT_NUMBER"{print $3}' Doxyfile`
 autoproj=`awk -F'[,)]' '/AC_INIT/{print $2}' configure.ac`
 
 if [ "$doxyproj" != "$autoproj" ]
