@@ -2,15 +2,55 @@ base=/tmp/chroot
 mirror=http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu/
 distro=precise
 
-threebdir=threeB-1.2-dev
+if ! git status | awk '$2=="modified:"{exit 1}'
+then
+	echo "There are uncommitted changes. This means that the build"
+	echo "Will not represent a sane version. Please commit all changes"
+	echo "before building."
+	exit 7
+fi
+
+
+doxyproj=`grep PROJECT_NUMBER Doxyfile | awk '{print $3}'`
+autoproj=`awk -F'[,)]' '/AC_INIT/{print $2}' configure.ac`
+
+if [ "$doxyproj" != "$autoproj" ]
+then
+	echo "Fatal Error: inconsistent project number!"
+	echo "Doxygen: $doxyproj"
+	echo "Autoconf: $autoproj"
+	echo "Please update the project number in one or both of those files."
+fi
+
+git_hash=`git rev-parse HEAD`
+
+if echo $autoproj | grep -q dev
+then
+	autoproj="$autoproj-$git_hash"
+fi
+
+threebdir=threeB-$autoproj
 threebversion=${threebdir}.tar.gz
 downloaddir=$PWD/build-downloads/
 
-if ! bash makedist.sh $threebdir
-then
-	echo Badness. Please remove $threebdir
-	exit 6
-fi
+#######################
+#
+# Now create a tar gz file. 
+# Shove in a version specific About file.
+#
+
+mkdir "$threebdir" || exit 9
+mkdir "$threebdir"/jar || exit 9
+
+cp jar/about.txt "$threebdir/jar"
+echo "Version: $threebdir" >> "$threebdir/jar/about.txt"
+echo "git hash: $git_hash" >> "$threebdir/jar/about.txt"
+
+
+git archive --prefix $threebdir $git_hash | tar -uf- "$threebdir/jar/about.txt" | gzip -9 > $threebversion
+
+
+exit 
 
 
 if ! [ -e $threebversion ]

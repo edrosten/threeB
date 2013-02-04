@@ -1,5 +1,5 @@
-AC_INIT(threeB,1.0)
-AC_COPYRIGHT(Copyright Edward Rosten and Susan Cox (2011))
+AC_INIT(threeB,1.2-dev)
+AC_COPYRIGHT(Copyright Edward Rosten and Susan Cox (2011, 2012, 2013))
 
 
 orig_CXXFLAGS="$CXXFLAGS"
