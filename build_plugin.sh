@@ -26,7 +26,7 @@ git_hash=`git rev-parse HEAD`
 
 if echo $autoproj | grep -q dev
 then
-	autoproj="$autoproj-$git_hash"
+	autoproj="$autoproj-`echo $git_hash| head -c 6`"
 fi
 
 threebdir=threeB-$autoproj
@@ -53,7 +53,9 @@ echo "Version: $threebdir" >> "$threebdir/jar/about.txt"
 echo "git hash: $git_hash" >> "$threebdir/jar/about.txt"
 
 
-git archive --prefix $threebdir $git_hash | tar -rf - "$threebdir/jar/about.txt" | gzip -9 > $threebversion
+git archive --prefix $threebdir $git_hash  > $threebversion.tar
+tar -rf $threebversion.tat "$threebdir/jar/about.txt" 
+gzip -9 $threebversion
 
 
 exit 
