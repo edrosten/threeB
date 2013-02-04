@@ -1,0 +1,31 @@
+Simple
+======
+
+Put full filenames into config file.
+
+Put partial filenames into config file.
+
+Perform sanity checking against filenames.
+
+Put TIFF filename from ImageJ and frame ranges into config file.
+
+Put checksumming of pixel values into config file.
+
+Perform check against checksumming
+
+Allow restarting from GUI
+
+Allow 3B to append to a file, rather than overwriting for a restart in place.
+
+
+
+Complex
+=======
+
+Automatic chunking from GUI.
+
+Reconstruct from multiple files.
+
+Gridengine scheduling from GUI?
+
+Simple job batching from GUI.

@@ -1,0 +1,27 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 24
+- CC        = gcc
+--- 24 -----
++ CC        = 
+***************
+*** 27
+- CFLAGS    = -O3 -I$(TOPDIR)/INCLUDE
+--- 27 -----
++ CFLAGS    = -O3 -I$(TOPDIR)/INCLUDE 
+***************
+*** 30
+- NOOPT     = -O0 -I$(TOPDIR)/INCLUDE
+--- 30 -----
++ NOOPT     = -O0 -I$(TOPDIR)/INCLUDE 
+***************
+*** 53
+- ARCH     = ar
+--- 53 -----
++ ARCH     = 
+***************
+*** 55
+- RANLIB   = ranlib
+--- 55 -----
++ RANLIB   = 

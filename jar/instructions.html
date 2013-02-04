@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+		<title>
+			Instructions for using 3B
+		</title>
+	</head>
+
+	<body>
+		<h1> 1. Instructions for using 3B </h1>
+
+		<h2> Analysing some new data </h2>
+		<h3> 1. Load an image stack </h3>
+		
+		Some test data can be loaded via <tt>Plugins &gt; Three B &gt; Load test data</tt>
+		<p>
+
+		The results should look something like this:
+		<p>
+		<img src="img/loaded_test_data.png" width=384 height=432 alt="Screengrab of some loaded data">
+		<p>
+
+		The image must contain significant areas which are not the thing you want to 
+		analyse. This is because 3B has to be able to estimate the background level and noise.
+		A good guide is that anything larger than 50&times;50 will probably be fine.
+
+		<h3> 2. Select a region to analyse </h3>
+
+		Select a region to analyse. Smaller regions analyse much faster, but you should leave a border 
+		of at least one or two pixels between the edge of the region and the pixels of interest. A
+		large region can be cut up into several smaller regions if necessary.
+		<p>
+
+		Generally, the selection brush is the most useful tool for selecting regions:
+		<p>
+
+		<img src="img/selection_brush.png" width=568 height=229 alt="Activating the selection brush">
+		<p>
+		
+		Then paint the area of interest. The results should look like this:
+		<p>
+		<img src="img/selected_area.png" width=384 height=432 alt="Area of interest selected.">
+		<p>
+	
+		<h3> 3. Run 3B analysis from the plugin menu </h3>
+
+		Activate the plugin from the menu <tt>Plugins &gt; Three B &gt; Three B</tt>. If you are reading
+		this tutorial, you almost certainly do not want to select the advanced option. If you go for
+		advanced options, it is easy to create meaningless results, or even crash ImageJ.
+		<p>
+		Set the pixel size and FWHM of the microscope. You can choose an initial number of spots, but the
+		default value will probably be about right:
+		<p>
+		<img src="img/dialog.png" width=321 height=427 alt="3B dialog box.">
+		<p>
+		If you enter values which are outside the reasonable range of parameters, then 
+		the 3B plugin will highlight the bad value and give an error message:
+		<p>
+		<img src="img/error.png" width=321 height=427 alt="3B error message.">
+		<p>
+
+		On pressing save, you will be invited to save the raw output of 3B from which a 
+		high resolution image can be reconstructed. This file is not an image but it can
+		be loaded by the 3B plugin.
+		<p>
+		On pressing OK, the 3B plugin will start analysing the data.
+
+		<h3> 4. Viewing the data</h3>
+		<a name="view"></a>
+		
+		The 3B plugin will bring up its control panel:
+		<p>
+		<img src="img/analysis.png" width=381 height=557 alt="3B control panel.">
+		<p>
+
+		The control panel shows a live view of the reconstruction as it is running,
+		and shows you which iteration the system is on.  The control panel allows
+		you to set the pixel size and FWHM of the reconstructed image. A larger number
+		of iterations will allow you to use a smaller FWHM.
+		<p>
+		The 3B analysis will run for 1200 iterations which is almost certainly more than
+		enough. The 3B run can be stopped when the reconstruction does not improve further.
+		You do not need to save the data once it is stopped, since the output file is written
+		continuously during the analysis.
+		<p>
+		It is recommended that 3B is run for 200 iterations. At this point the export button
+		will change from red to grey.
+		<p>
+		<h3> 5. Saving images, applying colourmaps, etc </h3>
+
+		At any stage during a 3B run or afterwards, you can press the "Export..." button to
+		get an ImageJ image. Once you have this image, a colourmap can be added
+		(for example <tt>Image &gt; Lookup Tables &gt; Fire</tt>) and the brightness and 
+		contrast can be adjusted (<tt>Image &gt; Adjust &gt; Brightness/Contrast</tt>) to
+		enhance the clarity of the results. For convenience, the 3B plugin provids the 
+		glow/hot colourmap (shown here) under <tt>Plugins &gt; Three B &gt; Glow LUT</tt>
+
+		You also may wish to add a scalebar (<tt>Analyze &gt; Tools &gt; Scale bar...</tt>).
+		The image will already be calibrated to the correct pixel size.
+
+		<p>
+		<img src="img/results.png" width=391 height=419 alt="Final results.">
+		<p>
+
+		<h2> 2. Loading an old analysis </h2>
+
+		Load an old analysis using <tt>Plugins &gt; Three B &gt; Open 3B run</tt>. Some sample
+		data has been provided with the plugin and can be loaded with <tt> Plugins &gt; Three B &gt; Open test data results</tt>.
+
+		The view dialog is almost identical to the control panel for running 3B, and
+		can be used in exactly the same way. For further instructions, see
+		<a href="#view">1.4 Viewing the data</a>.
+
+		Note that you have to specify the pixel size when you load data from a file.
+		This is because 3B uses the FWHM in pixels (not nm), so it does not make use
+		of or record the pixel size in nm.
+
+	</body>
+</html>

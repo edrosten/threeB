@@ -1,0 +1,94 @@
+CXX=@CXX@
+CC=@CC@
+CXXFLAGS=@CXXFLAGS@ -I "@JAVAPATH@" -I "@JAVAPATH@/win32" -I.
+LDFLAGS=@LDFLAGS@ @LIBS@
+CLASSPATH+=@CLASSPATH@
+CPPFLAGS=@CPPFLAGS@
+JAVADIR=@JAVAPATH@
+LD=$(CXX)
+
+
+STATIC_PART=-static-libgcc -Wl,-Bstatic -lcvd -ljpeg -lgvars3_headless -llapack -lblas -lgfortran -lstdc++
+DYNAMIC_PART= -Wl,-Bdynamic -lpng -ltiff -lrt
+
+ifeq ($(DYNAMIC_PLUGIN),1)
+	PLUGIN_LIBS=-lcvd -lGVars3_headless -llapack
+else
+	PLUGIN_LIBS=-Wl,-Bstatic -lcvd -lGVars3_headless -llapack -lblas -lf2c  -Wl,-Bdynamic
+endif
+
+LDFLAGS_S=$(STATIC_PART) $(DYNAMIC_PART)
+LDFLAGS_S=-static -lcvd -ljpeg -lGVars3_headless -llapack -lblas -lf2c -lpng -ltiff -lz 
+
+
+PROGS=multispot5_headless three_B.jar libmultispot5_jni.so
+
+.PHONY: all clean prog plugin
+
+prog:multispot5_headless
+plugin:three_B.jar libthreeB_jni.so
+
+all:prog plugin
+
+spot_viewer:spot_viewer.o utility.o storm_imagery.o storm_imagery_no_load.o
+	$(CXX) -o $@ $^ $(LDFLAGS) 
+
+basic_objs=multispot5.o utility.o mersenne.o multispot5_place_methods.o multispot5_place_methods.o multispot5_place_choice.o storm_imagery_no_load.o
+multispot5_objs=$(basic_objs) storm_imagery.o
+
+multispot5:multispot5_gui.o $(multispot5_objs)
+	$(CXX) -o $@ $^ $(LDFLAGS) 
+
+multispot5_headless: multispot5_headless.o $(multispot5_objs)
+	$(CXX) -o $@ $^ $(LDFLAGS) 
+
+multispot5_static: $(multispot5_objs) multispot5_headless.o
+	$(CXX) -o $@ $^ $(LDFLAGS_S)
+clean:
+	rm -f $(PROGS) *.o jar/*.class ThreeBRunner.h three_B.jar libmultispot5_jni.so
+
+
+#Magic incantation to get MinGW to build a DLL
+MINGW=$(HOME)/mingw/lib/
+
+# Under MinGW, libCVD etc build .a and .dll files. Windows can't link to 
+# a .dll file without a corresponding .a file. The .a file built is just a normal
+# static library, not the one used for linking .dlls. As a result, there are no
+# linkable dlls built, so the static libraries are pulled in automatically.
+#
+threeB_jni.dll: multispot5_jni.o $(multispot5_objs)
+	$(CXX) -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at  $^  -shared -o $@ $(LDFLAGS)
+	
+	
+	#$(MINGW)/liblapack.a $(MINGW)/libblas.a $(MINGW)/libcvd.a $(MINGW)/libGVars3_headless.a -lgfortran
+
+vpath %.class jar/
+
+multispot5_jni.o:ThreeBRunner.h
+
+##Warning: this will only work if LAPACK, BLAS and F2C have been compiled as PIC
+##It will also only work if there are no additional support libraries required
+##
+##CLAPACK:
+##  Make sure you add -fPIC to the build line, in Linux
+##  Make sure you compile with -DTOON_CLAPACK
+libthreeB_jni.so:multispot5_jni.o $(basic_objs)
+	g++ -shared -o libthreeB_jni.so $^ $(PLUGIN_LIBS)
+
+three_B.jar: three_B.class  jar/plugins.config jar/multispot5.cfg LoadTestData.class ThreeBHelp.class ClassicGlow.class ThreeBLoader.class
+	jar cvfM three_B.jar -C jar/ .
+
+%.class: %.java
+	javac -classpath $(CLASSPATH):jar/ -d jar $<
+
+ThreeBRunner.h: three_B.class
+	javah -classpath jar ThreeBRunner
+
+
+# make -nB | awk '{for(i=1;i<=NF; i++)if($(i)~/\.(cc)|(cpp)$/)print $(i)}' | xargs makedepend -f - 2> /dev/null | awk '!/usr/ && !/#/{for(i=2; i <= NF; i++)a[$1] = a[$1] " " $(i)}END{for(i in a)print i, a[i]}' >> Makefile.in
+storm_imagery.o:  storm_imagery.h debug.h utility.h
+multispot5.o:  conjugate_gradient_only.h forward_algorithm.h numerical_derivatives.h storm.h utility.h storm_imagery.h debug.h sampled_multispot.h drift.h spot_with_background.hh
+utility.o:  utility.h debug.h
+multispot5_headless.o:  storm_imagery.h multispot5.h utility.h mt19937.h
+multispot5_place_methods.o:  multispot5.h utility.h mt19937.h randomc.h storm.h debug.h
+multispot5_place_choice.o:  multispot5_place_methods.h multispot5.h utility.h multispot5_place_choice.h debug.h
