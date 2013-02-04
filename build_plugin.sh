@@ -57,10 +57,6 @@ git archive --prefix $threebdir/ $git_hash  > $threebdir.tar
 tar -rf $threebdir.tar "$threebdir/jar/about.txt" 
 gzip -9 $threebdir.tar
 
-
-exit 
-
-
 if ! [ -e $threebversion ]
 then
 	echo Error: $threebversion missing.
