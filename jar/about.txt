@@ -1,0 +1,8 @@
+3B: Bayesian Analysis of blinking and bleaching.
+------------------------------------------------
+
+Please visit http://3bmicroscopy.com for further information.
+
+If you are reporting a bug, please copy the following lines into
+the bug report:
+

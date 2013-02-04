@@ -1,0 +1,7 @@
+config.status
+config.log
+build-downloads/*
+autom4te.cache/*
+Makefile
+.*.swp
+dist-*/*
