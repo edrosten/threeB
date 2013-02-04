@@ -395,7 +395,7 @@ do
 
 done
 
-dist=dist-$$$RANDOM/ThreeB
+dist=dist-$git_hash/ThreeB
 mkdir -p $dist
 check
 
