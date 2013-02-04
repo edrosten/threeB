@@ -54,8 +54,8 @@ echo "git hash: $git_hash" >> "$threebdir/jar/about.txt"
 
 
 git archive --prefix $threebdir $git_hash  > $threebdir.tar
-tar -rf $threebdir.tat "$threebdir/jar/about.txt" 
-gzip -9 $threebdir
+tar -rf $threebdir.tar "$threebdir/jar/about.txt" 
+gzip -9 $threebdir.tar
 
 
 exit 
