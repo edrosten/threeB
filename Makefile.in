@@ -57,7 +57,7 @@ MINGW=$(HOME)/mingw/lib/
 # linkable dlls built, so the static libraries are pulled in automatically.
 #
 threeB_jni.dll: multispot5_jni.o $(multispot5_objs)
-	$(CXX) -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at  $^  -shared -o $@ $(LDFLAGS)
+	$(CXX) -static-libgcc -static-libstdc++ -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at  $^  -shared -o $@ $(LDFLAGS)
 	
 	
 	#$(MINGW)/liblapack.a $(MINGW)/libblas.a $(MINGW)/libcvd.a $(MINGW)/libGVars3_headless.a -lgfortran
