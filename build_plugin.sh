@@ -54,6 +54,9 @@ echo "git hash: $git_hash" >> "$threebdir/jar/about.txt"
 
 echo "#define BUILDVERSION  \"$threebdir\"" >> "$threebdir/version.cc"
 echo "#define BUILDHASH     \"$git_hash\"" >> "$threebdir/version.cc"
+echo "#define BUILDDATE     \"$(date +'%Y:%m:%d-%T%z %s'$)\""  >> "$threebdir/version.cc"
+echo "#define BUILDHOST     \"$(uname -a)\"" >> "$threebdir/version.cc"
+
 
 git archive --prefix $threebdir/ $git_hash  > $threebdir.tar
 tar -rf $threebdir.tar "$threebdir/jar/about.txt" 
