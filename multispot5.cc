@@ -2052,7 +2052,7 @@ class FitSpots
 	void run()
 	{
 		graphics.init(ims[0].size());
-		save_spots << "LOGVERSION 2" << endl;
+		save_spots << "LOGVERSION 2 1" << endl;
 		save_spots << "BUILDVERSION " << BUILDVERSION << endl;
 		save_spots << "BUILDHASH " << BUILDHASH << endl;
 		save_spots << "BUILDDATE " << __TIME__ << " " << __DATE__ << endl;
