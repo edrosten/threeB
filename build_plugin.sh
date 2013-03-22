@@ -57,6 +57,7 @@ echo "#define BUILDHASH     \"$git_hash\"" >> "$threebdir/version.cc"
 
 git archive --prefix $threebdir/ $git_hash  > $threebdir.tar
 tar -rf $threebdir.tar "$threebdir/jar/about.txt" 
+tar -rf $threebdir.tar "$threebdir/version.cc"
 gzip -9 $threebdir.tar
 
 if ! [ -e $threebversion ]

@@ -2054,7 +2054,7 @@ class FitSpots
 		save_spots << "BUILDVERSION " << BUILDVERSION << endl;
 		save_spots << "BUILDHASH " << BUILDHASH << endl;
 		save_spots << "BUILDDATE " << __TIME__ << " " << __DATE__ << endl;
-		save_spots << "SOURCETIMESTAMP" << __TIMESTAMP__ << endl;
+		save_spots << "SOURCETIMESTAMP " << __TIMESTAMP__ << endl;
 
 		save_spots << "PIXELS";
 		for(unsigned int i=0; i < pixels.size(); i++)
