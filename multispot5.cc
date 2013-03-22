@@ -2055,7 +2055,7 @@ class FitSpots
 		save_spots << "LOGVERSION 2 1" << endl;
 		save_spots << "BUILDVERSION " << BUILDVERSION << endl;
 		save_spots << "BUILDHASH " << BUILDHASH << endl;
-		save_spots << "BUILDDATE " << __TIME__ << " " << __DATE__ << endl;
+		save_spots << "BUILDDATE " << BUILDDATE << endl;
 		save_spots << "BUILDHOST " << BUILDHOST << endl;
 
 		save_spots << "PIXELS";
