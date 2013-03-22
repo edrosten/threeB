@@ -2039,11 +2039,23 @@ class FitSpots
 		}
 	}
 	
+	
+	#include "version.cc"
+	#ifndef BUILDVERSION
+	#define	BUILDVERSION "unknown"
+	#define	BUILDHASH    "unknown"
+	#endif
+
 	///Run the complete optimization algorithm.
 	void run()
 	{
 		graphics.init(ims[0].size());
 		save_spots << "LOGVERSION 2" << endl;
+		save_spots << "BUILDVERSION " << BUILDVERSION << endl;
+		save_spots << "BUILDHASH " << BUILDHASH << endl;
+		save_spots << "BUILDDATE " << __TIME__ << " " << __DATE__ << endl;
+		save_spots << "SOURCETIMESTAMP" << __TIMESTAMP__ << endl;
+
 		save_spots << "PIXELS";
 		for(unsigned int i=0; i < pixels.size(); i++)
 			save_spots << " " << pixels[i].x << " " << pixels[i].y;

@@ -52,6 +52,8 @@ cp jar/about.txt "$threebdir/jar"
 echo "Version: $threebdir" >> "$threebdir/jar/about.txt"
 echo "git hash: $git_hash" >> "$threebdir/jar/about.txt"
 
+echo "#define BUILDVERSION  \"$threebdir\"" >> "$threebdir/version.cc"
+echo "#define BUILDHASH     \"$git_hash\"" >> "$threebdir/version.cc"
 
 git archive --prefix $threebdir/ $git_hash  > $threebdir.tar
 tar -rf $threebdir.tar "$threebdir/jar/about.txt" 
