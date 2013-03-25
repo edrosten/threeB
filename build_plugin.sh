@@ -459,6 +459,7 @@ execute_build
 
 export list="amd64_static"
 export distro=lucid
+execute_build
 
 
 
