@@ -43,8 +43,7 @@ multispot5_headless: multispot5_headless.o $(multispot5_objs)
 	$(CXX) -o $@ $^ $(LDFLAGS) 
 
 multispot5_static: $(multispot5_objs) multispot5_headless.o
-	$(CXX) -static-libstdc++ -o $@ $^ -Wl,-Bstatic -lcvd -lGVars3_headless -llapack -lblas -lf2c  -ljpeg -lpng -ltiff -lz -Wl,-Bdynamic
-
+	$(CXX) -o $@ $^ $(LDFLAGS_S)
 clean:
 	rm -f $(PROGS) *.o jar/*.class ThreeBRunner.h three_B.jar libmultispot5_jni.so
 
