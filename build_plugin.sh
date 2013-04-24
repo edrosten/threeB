@@ -71,7 +71,7 @@ fi
 
 
 CVDNAME=libcvd-20121025
-GVARSNAME=gvars3-20120724
+GVARSNAME=gvars-3.0
 TOONNAME=TooN-2.0
 
 CVD=$CVDNAME.tar.gz
@@ -457,7 +457,7 @@ export distro=precise
 export list="i386 amd64 amd64_mingw32 amd64_mingw64"
 execute_build
 
-export list="amd64_static"
+export list="amd64_static i386_static"
 export distro=lucid
 execute_build
 
