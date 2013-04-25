@@ -196,6 +196,23 @@ Get GVars3 here: http://www.edwardrosten.com/cvd/gvars3.html
 ])
 fi
 
+
+AC_MSG_CHECKING([TooN support in GVars])
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([
+	#include <gvars3/instances.h>
+	#include <TooN/TooN.h>
+	int main(){GVars3::GV3::get<TooN::Vector<> >("", "");}
+])], [gvarstoon=yes], [gvarstoon=no])
+
+AC_MSG_RESULT($gvarstoon)
+if test $gvarstoon = no
+then
+	AC_MSG_ERROR([GVars3 has not been compiled with TooN support.
+Since TooN is installed, this means you need to recompile GVars3.
+])
+fi
+
+
 ################################################################################
 #
 # Check for libcvd

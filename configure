@@ -3469,6 +3469,34 @@ Get GVars3 here: http://www.edwardrosten.com/cvd/gvars3.html
 " "$LINENO" 5
 fi
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking TooN support in GVars" >&5
+$as_echo_n "checking TooN support in GVars... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+	#include <gvars3/instances.h>
+	#include <TooN/TooN.h>
+	int main(){GVars3::GV3::get<TooN::Vector<> >("", "");}
+
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  gvarstoon=yes
+else
+  gvarstoon=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $gvarstoon" >&5
+$as_echo "$gvarstoon" >&6; }
+if test $gvarstoon = no
+then
+	as_fn_error $? "GVars3 has not been compiled with TooN support.
+Since TooN is installed, this means you need to recompile GVars3.
+" "$LINENO" 5
+fi
+
+
 ################################################################################
 #
 # Check for libcvd
