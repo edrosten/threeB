@@ -35,6 +35,9 @@
 #include "multispot5.h"
 
 
+#define LOGVERSION_MAJOR 1
+#define LOGVERSION_MINOR 2
+
 //For benchmarking...
 #define TIME(X) 
 //#define TIME(X) X
@@ -980,6 +983,13 @@ Which moron invented this file format???
 Note that the file format hasn't beren fixed, so that the output can easily be compared to the 
 output of the historic version which is known to be good.
 
+The version history of the log file:
+1.0 Original log file.
+1.1 Add in build time/date/commit.
+1.2 Fixed optimization routine.
+
+
+
 @param in Stream to parse file from
 @ingroup gStorm
 */
@@ -1000,6 +1010,12 @@ StateParameters parse_log_file(istream& in)
 	bool doing_gvars = 0;
 
 	vector<ImageRef> pixels;
+
+	//Log version defaults.
+	//Note the first version of the log file had no version numbering
+	//so we have to assume that this is the version.
+	int major=1;
+	int minor=0;
 
 	while(!in.eof())
 	{	
@@ -1081,7 +1097,30 @@ StateParameters parse_log_file(istream& in)
 			else
 				throw LogFileParseError("Bad PIXELS line");
 		}
+		else if(line.substr(0, 11) == "LOGVERSION ")
+		{
+			vector<string> l = split(line);
+			if(l.size() != 3)
+				throw LogFileParseError("Bad LOGVERSION line");
+			
+			major = atox<int>(l[1], "LOGVERSION");
+			minor = atox<int>(l[2], "LOGVERSION");
+
+			if(major > LOGVERSION_MAJOR || (major == LOGVERSION_MAJOR && minor > LOGVERSION_MINOR))
+				throw LogFileParseError("Log file is from a newer version of 3B. Please upgrade.");
+		}
 	}
+
+	//Now deal with older versions of the code.
+	
+	//Versions prior to 1.2 had errors in the optimization routine. 
+	//So, when processing old files, make sure the original (buggy) optimization routine
+	//is used for consistency.
+	if(major == 1 && minor <= 1)
+	{
+		GV3::get<int>("main.optimization_version", 0, 1) = 1;
+	}
+
 
 	if(!state_ok)
 		throw LogFileParseError("No state found");
@@ -1390,6 +1429,7 @@ class FitSpots
 	const int main_samples;            ///< Number of samples to use in main loop
 	const int main_passes;             ///< Number of passes to perform per iteration in main loop
 	const int outer_loop_iterations;   ///< Total number of iterations to perform
+	const int optimization_version;    ///< Which version? NatMeth (1) or bugfixed (2)
 	
 	//Spot selection loop
 	const int add_remove_tries;        ///< Number of attemts to add/remove a spot
@@ -1474,6 +1514,7 @@ class FitSpots
 	 main_samples(GV3::get<int>("main.gibbs.samples", 0, -1)),
 	 main_passes(GV3::get<int>("main.passes", 0, -1)),
 	 outer_loop_iterations(GV3::get<int>("main.total_iterations", 100000000, 1)),
+	 optimization_version(GV3::get<int>("main.optimization_version", 0, -1)),
 	 
 	 //Spot selection loop
 	 add_remove_tries(GV3::get<int>("add_remove.tries", 0, -1)),
@@ -1513,7 +1554,7 @@ class FitSpots
 	}
 	
 	///Perform a complete iteration of the optimzation stage of the spot firrint algorithm
-	void optimize_each_spot_in_turn_for_several_passes()
+	void optimize_each_spot_in_turn_for_several_passes_version_1_natmeth_orig_with_bugs()
 	{
 		//Precompute the intensities for all spot pixels
 		vector<vector<double> > spot_intensities; //[spot][pixel]
@@ -1526,6 +1567,7 @@ class FitSpots
 		for(unsigned int s=0; s < spots.size(); s++)
 			get_spot_pixels(pixels, spots[s], spot_pixels[s]);
 
+		save_spots << "Optimize using: " << __FUNCTION__ << endl;
 		
 		//Optimize the model, N spots at a time.
 		//
@@ -1570,6 +1612,219 @@ class FitSpots
 					tmp_spot[i] = spots[index[i]];
 					swap(tmp_spot_intensities[i], spot_intensities[index[i]]);
 					swap(tmp_spot_pixels[i], spot_pixels[i]);
+				}
+
+				swap(tmp_spot, spots);
+				swap(tmp_spot_intensities, spot_intensities);
+				swap(tmp_spot_pixels, spot_pixels);
+			}
+
+			//Sweep through and optimize each spot in turn
+			for(int s=0; s < (int)spots.size(); s++)
+			{
+				ui.per_spot(iteration, pass, s, spots.size()); 
+				ui.perhaps_stop();
+
+				TIME(timer.reset();)
+				//Get some samples with Gibbs sampling
+				vector<vector<vector<State> > > sample_list; //[N][spot][frame]: list of samples drawn using Gibbs sampling
+				vector<vector<vector<double> > > sample_intensities; //[sample][frame][pixel]
+
+				GibbsSampler2 sampler(pixel_intensities, spot_intensities, spots, spot_pixels, A, pi, variance, sample_iterations);
+				for(int i=0; i < main_samples; i++)
+				{
+					sampler.next(rng);
+					sample_list.push_back(sampler.sample());
+					sample_intensities.push_back(sampler.sample_intensities());
+
+					ui.perhaps_stop();
+				}
+
+				//First, remove the spot from all the samples.
+				for(unsigned int i=0; i < sample_list.size(); i++)
+					remove_spot(sample_intensities[i], spot_intensities[s], sample_list[i][s]);
+				
+				//cout << timer.get_time() << endl;
+				TIME(time_gibbs += timer.reset();)
+
+				//Package up all the data
+				SampledBackgroundData data(sample_intensities, pixel_intensities, pixels, 
+										   intensity_mu, intensity_sigma, blur_mu, blur_sigma, 
+										   A, pi, variance);
+				
+				//Derivative computer:
+				SpotNegProbabilityDiffWithSampledBackground compute_deriv(data);
+				
+
+				graphics.draw_pixels(pixels, 0, 0, 1, 1);
+				graphics.draw_krap(spots, scale_to_bytes(ave), boundingbox(pixels), s);
+				graphics.swap();
+
+				//Optimize spot "s"
+				//Optimize with the derivatives only since the actual probability
+				//is much harder to compute
+				ConjugateGradientOnly<4> cg(spots[s], compute_deriv, limit);
+
+
+				cg.max_iterations = main_cg_max_iterations;
+
+
+				#if 0
+					cout << setprecision(10);
+					cout << spots_to_Vector(spots) << endl;
+					Matrix<4> hess, hess_errors;
+					cout << "Hello, my name is Inigo Montoya\n";
+					/*for(int i=0; i < 4; i++)
+					{
+						Matrix<4, 2> d = numerical_gradient_with_errors(NthDeriv(compute_deriv, i), cg.x);
+						hess[i] = d.T()[0];
+						hess_errors[i] = d.T()[1];
+					}
+					*/
+					//cout << "Errors:\n" << hess_errors << endl;
+					//cout << "NHess:\n" << hess<< endl;
+					Matrix<4> rhess =  -sampled_background_spot_hessian(cg.x, data);
+					cout << "Hess:\n" << rhess << endl;
+					//cout << "Err:\n" << hess - rhess << endl;
+
+					//Vector<4> grad = compute_deriv(cg.x);
+
+					//Matrix<4> e = hess - rhess;
+
+					//for(int i=0; i < 4; i++)
+					//	for(int j=0; j < 4; j++)
+					//		e[i][j] /= hess_errors[i][j];
+
+					//cout << "Err:\n" << e << endl;
+					cout << "Deriv:" <<  compute_deriv(cg.x) << endl;
+					//cout << "Full:\n" << sampled_background_spot_hessian2(cg.x, data) - grad.as_col()*grad.as_row() << endl;
+
+					FreeEnergyHessian hesscomputer(data_for_h_mcmc);
+
+					Matrix<4> nhess = hesscomputer.hessian(spots, 0);
+					cout << "NHess:\n" << nhess << endl;
+
+					cout << "Turbo-N Hess:\n" << sampled_background_spot_hessian_ffbs(cg.x, data, 10000) << endl;
+
+					cout << "TI energy: " << NegativeFreeEnergy(data_for_t_mcmc)(spots_to_Vector(spots)) << endl;
+					cout << "FA energy: " <<  SpotProbabilityWithSampledBackgroundFAKE(data)(cg.x) << endl;
+
+
+
+					//cout << "Numerical hessian from FD:\n" << numerical_hessian(SpotProbabilityWithSampledBackgroundFAKE(data), cg.x) << endl;
+					exit(0);
+				#endif
+				//cout << "Starting opt... " << cg.x << endl;
+				while(cg.iterate(compute_deriv))
+				{
+					graphics.draw_krap(spots, scale_to_bytes(ave), boundingbox(pixels), s, cg.x);
+					graphics.draw_pixels(pixels, 0, 0, 1, .2);
+					graphics.swap();
+					ui.perhaps_stop();
+					//cout << cg.x << endl;
+				}
+
+				//Update to use the result of the optimization
+				spots[s] = cg.x;
+				//cout << "End: " << cg.x << endl;
+				
+				graphics.draw_krap(spots, scale_to_bytes(ave), boundingbox(pixels), -1);
+				graphics.swap();
+					
+				//Recompute the new spot intensity, since the spot has changed
+				spot_intensities[s] = compute_spot_intensity(pixels, spots[s]);
+
+				//Recompute which are the useful pixels
+				get_spot_pixels(pixels, spots[s], spot_pixels[s]);
+				
+				//Is the spot within the allowed area, i.e. is it's prior 0?
+				//The prior is sero only if it we are using it and we're in an invalid area
+
+				ImageRef quantized_spot_position = ir_rounded(spots[s].slice<2,2>());
+				bool zero_prior = use_position_prior && (allowed_area.count(quantized_spot_position)==0);
+
+				//Check to see if spot has been ejected. If spot_pixels is empty, then it has certainly been ejected.
+				if(spot_pixels[s].empty() || zero_prior)
+				{
+					//Spot has been ejected. Erase it.
+					cout  << " Erasing ejected spot: " << spot_pixels[s].empty() << " " << zero_prior << endl;
+					cout << spots[s] << endl;
+					//GUI_Pause(1);
+
+					spot_intensities.erase(spot_intensities.begin() + s);
+					spot_pixels.erase(spot_pixels.begin() + s);
+					spots.erase(spots.begin() + s);
+					s--;
+					//exit(0);
+				}
+				
+				//cout << timer.get_time() << endl;
+				TIME(time_cg += timer.reset();)
+
+				//cout << "Times: " << time_gibbs << " " << time_cg << endl;
+				//save_spots << "INTERMEDIATE: " << setprecision(15) << scientific << spots_to_Vector(spots) << endl;
+			}
+		}
+	}
+	///Perform a complete iteration of the optimzation stage of the spot firrint algorithm
+	void optimize_each_spot_in_turn_for_several_passes_version_2()
+	{
+		//Precompute the intensities for all spot pixels
+		vector<vector<double> > spot_intensities; //[spot][pixel]
+		for(unsigned int i=0; i < spots.size(); i++)
+			spot_intensities.push_back(compute_spot_intensity(pixels, spots[i]));
+
+		//Which pixels does each spot have?
+		vector<vector<int> > spot_pixels; //[spot][pixel]
+		spot_pixels.resize(spots.size());
+		for(unsigned int s=0; s < spots.size(); s++)
+			get_spot_pixels(pixels, spots[s], spot_pixels[s]);
+
+		save_spots << "Optimize using: " << __FUNCTION__ << endl;
+		
+		//Optimize the model, N spots at a time.
+		//
+		for(int pass=start_pass; pass < main_passes; pass++)
+		{
+			save_spots << "Pass: " << pass << endl;
+			rng.write(save_spots);
+			save_spots << endl;
+
+			start_pass=0; // This is only nonzero first time, since we might chekpoint midway through an iteration
+			save_spots << "PASS" << pass << ": " << setprecision(20) << scientific << spots_to_Vector(spots) << endl;
+			save_spots << "ENDCHECKPOINT" << endl << flush;
+
+			ui.per_pass(iteration, pass, spots);
+			//Sort spots according to pass%4
+
+			//Sort the spots so that the optimization runs in sweeps
+			//This heiristic seems to increase the rate of propagation of information
+			//about spot positions.
+
+			//Create a list of indices
+			vector<int> index = sequence(spots.size());
+			
+			int passs = pass + iteration;
+			//Sort the indices according to the position of the spot that they index
+			if(passs%4 == 0)
+				sort(index.begin(), index.end(), IndexLexicographicPosition<less<double>, 2>(spots));
+			else if(passs%4==1)
+				sort(index.begin(), index.end(), IndexLexicographicPosition<greater<double>, 2>(spots));
+			else if(passs%4==2)
+				sort(index.begin(), index.end(), IndexLexicographicPosition<less<double>, 3>(spots));
+			else
+				sort(index.begin(), index.end(), IndexLexicographicPosition<greater<double>, 3>(spots));
+
+			//Reorder the spots and their intensities and their pixel lists
+			{
+				vector<Vector<4> > tmp_spot(index.size());
+				vector<vector<double> > tmp_spot_intensities(index.size());
+				vector<vector<int> > tmp_spot_pixels(index.size());
+				for(unsigned int i=0; i < index.size(); i++)
+				{
+					tmp_spot[i] = spots[index[i]];
+					swap(tmp_spot_intensities[i], spot_intensities[index[i]]);
+					swap(tmp_spot_pixels[i], spot_pixels[index[i]]);
 				}
 
 				swap(tmp_spot, spots);
@@ -2052,7 +2307,7 @@ class FitSpots
 	void run()
 	{
 		graphics.init(ims[0].size());
-		save_spots << "LOGVERSION 2 1" << endl;
+		save_spots << "LOGVERSION " << LOGVERSION_MAJOR << " " << LOGVERSION_MINOR << endl;
 		save_spots << "BUILDVERSION " << BUILDVERSION << endl;
 		save_spots << "BUILDHASH " << BUILDHASH << endl;
 		save_spots << "BUILDDATE " << BUILDDATE << endl;
@@ -2079,8 +2334,17 @@ class FitSpots
 			cout << endl << endl << "----------------------" << endl << "Optimizing:\n";
 			cout << spots.size() << endl;
 			
-
-			optimize_each_spot_in_turn_for_several_passes();
+			
+			if(optimization_version == 1)
+				optimize_each_spot_in_turn_for_several_passes_version_1_natmeth_orig_with_bugs();
+			else if(optimization_version == 2)
+				optimize_each_spot_in_turn_for_several_passes_version_2();
+			else
+			{
+				save_spots<< "ERROR: bad optimization version " << optimization_version << endl;
+				cerr << "ERROR: bad optimization version " << optimization_version << endl;
+				return;
+			}
 
 			//spot_intensities is be correct here!
 			try_modifying_model();
