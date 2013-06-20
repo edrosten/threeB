@@ -1094,6 +1094,7 @@ class EControlPanel extends JFrame implements WindowListener
 	private synchronized void update_canvas()
 	{
 		reconstruction_blur_fwhm = blur_fwhm.getValue();
+
 		zoom = pixel_size_in_nm / reconstructed_pixel_size.getValue();
 
 		linear_reconstruction.setProcessor(reconstruct());
@@ -1170,8 +1171,10 @@ class EControlPanel extends JFrame implements WindowListener
 		int xoff = (int)roi.x;
 		int yoff = (int)roi.y;
 
-		int xsize = (int)Math.ceil(roi.width * zoom);
-		int ysize = (int)Math.ceil(roi.height * zoom);
+		//Apparently combining a 1x1 rectangle at 0,0 and 24,24 gives a total width of... 24.
+		//lol.
+		int xsize = (int)Math.round((roi.width + 1) * zoom);
+		int ysize = (int)Math.round((roi.height + 1) * zoom);
 		
 		//New blank image set to zero
 		FloatProcessor reconstructed = new FloatProcessor(xsize, ysize);
