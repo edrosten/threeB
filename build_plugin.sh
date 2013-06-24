@@ -1,4 +1,4 @@
-base=/tmp/chroot
+base=/chroot
 mirror=http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu/
 distro=precise
 
