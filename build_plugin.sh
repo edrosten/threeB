@@ -1,6 +1,7 @@
 base=/chroot
 mirror=http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu/
 distro=precise
+branch=`git branch | awk '/\*/{print $2}'`
 
 if ! git status | awk '$2=="modified:"{exit 1}'
 then
@@ -126,7 +127,7 @@ list="i386 amd64 amd64_mingw32 amd64_mingw64 amd64_static"
 #list=amd64_static
 
 #Create an output directory
-dist=dist-$git_hash/ThreeB
+dist=dist-$branch-$git_hash/ThreeB
 mkdir -p $dist
 check
 
