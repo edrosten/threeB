@@ -2330,7 +2330,7 @@ class FitSpots
 
 		int consecutive_empty_models=0;
 
-		for(iteration=start_iteration; iteration < outer_loop_iterations  && allowed_consecutive_empty > 0 && consecutive_empty_models < allowed_consecutive_empty ;iteration++)
+		for(iteration=start_iteration; iteration < outer_loop_iterations  && (allowed_consecutive_empty <= 0 || consecutive_empty_models < allowed_consecutive_empty) ;iteration++)
 		{
 			save_spots << "Iteration: " << iteration << " (" << iteration *  main_passes << ")" << endl;
 			save_spots << "MAIN: " << setprecision(20) << scientific << spots_to_Vector(spots) << endl;
