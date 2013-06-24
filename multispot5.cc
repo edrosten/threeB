@@ -1430,6 +1430,7 @@ class FitSpots
 	const int main_passes;             ///< Number of passes to perform per iteration in main loop
 	const int outer_loop_iterations;   ///< Total number of iterations to perform
 	const int optimization_version;    ///< Which version? NatMeth (1) or bugfixed (2)
+	const int allowed_consecutive_empty;///<Quit after this many empty consecutive models. 0 or fewer means never quit.
 	
 	//Spot selection loop
 	const int add_remove_tries;        ///< Number of attemts to add/remove a spot
@@ -1515,6 +1516,7 @@ class FitSpots
 	 main_passes(GV3::get<int>("main.passes", 0, -1)),
 	 outer_loop_iterations(GV3::get<int>("main.total_iterations", 100000000, 1)),
 	 optimization_version(GV3::get<int>("main.optimization_version", 0, -1)),
+	 allowed_consecutive_empty(GV3::get<int>("main.consecutive_empty_models", 0, 1)),
 	 
 	 //Spot selection loop
 	 add_remove_tries(GV3::get<int>("add_remove.tries", 0, -1)),
@@ -2326,7 +2328,9 @@ class FitSpots
 
 		cout << "Limit vector: " << limit << endl;
 
-		for(iteration=start_iteration; iteration < outer_loop_iterations ;iteration++)
+		int consecutive_empty_models=0;
+
+		for(iteration=start_iteration; iteration < outer_loop_iterations  && allowed_consecutive_empty > 0 && consecutive_empty_models < allowed_consecutive_empty ;iteration++)
 		{
 			save_spots << "Iteration: " << iteration << " (" << iteration *  main_passes << ")" << endl;
 			save_spots << "MAIN: " << setprecision(20) << scientific << spots_to_Vector(spots) << endl;
@@ -2348,6 +2352,11 @@ class FitSpots
 
 			//spot_intensities is be correct here!
 			try_modifying_model();
+
+			if(spots.size() == 0)
+				consecutive_empty_models++;
+			else
+				consecutive_empty_models = 0;
 		}
 		save_spots << "FINAL: " << setprecision(15) << scientific << spots_to_Vector(spots) << endl;
 	}
