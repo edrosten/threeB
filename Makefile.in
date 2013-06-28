@@ -38,10 +38,10 @@ basic_objs=multispot5.o utility.o mersenne.o multispot5_place_methods.o multispo
 multispot5_objs=$(basic_objs) storm_imagery.o
 
 multispot5:multispot5_gui.o $(multispot5_objs)
-	$(CXX) -o $@ $^ $(LDFLAGS) 
+	$(CXX) -o $@ $^ $(LDFLAGS)  $(LDLIBS)
 
 multispot5_headless: multispot5_headless.o $(multispot5_objs)
-	$(CXX) -o $@ $^ $(LDFLAGS) 
+	$(CXX) -o $@ $^ $(LDFLAGS)  $(LDLIBS)
 
 multispot5_static: $(multispot5_objs) multispot5_headless.o
 	$(CXX) -o $@ $^ $(LDFLAGS_S)
@@ -58,7 +58,7 @@ MINGW=$(HOME)/mingw/lib/
 # linkable dlls built, so the static libraries are pulled in automatically.
 #
 threeB_jni.dll: multispot5_jni.o $(multispot5_objs)
-	$(CXX) -static-libgcc -static-libstdc++ -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at  $^  -shared -o $@ $(LDFLAGS)
+	$(CXX) -static-libgcc -static-libstdc++ -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at  $^  -shared -o $@ $(LDFLAGS) $(LDLIBS)
 	
 	
 	#$(MINGW)/liblapack.a $(MINGW)/libblas.a $(MINGW)/libcvd.a $(MINGW)/libGVars3_headless.a -lgfortran
