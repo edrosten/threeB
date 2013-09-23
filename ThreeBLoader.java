@@ -46,8 +46,12 @@ public class  ThreeBLoader implements PlugIn {
 		InputStream in = null;
 		String name;
 		double ps;
+		double ini_FWHM=100., ini_reconstruction_pixel_size=10.;
+		boolean show_control_panel=true;
 
 		try{
+
+System.out.println("yoyoyo:" + arg);
 			if(arg.equals("test"))
 			{
 				name = "test_data.txt";
@@ -82,8 +86,20 @@ public class  ThreeBLoader implements PlugIn {
 
 				GenericDialog g = new GenericDialog("Pixel size");
 				g.addNumericField("Pixel size", 100., 0, 5, "nm");
+				g.addNumericField("FWHM (initial) ", ini_FWHM, 0, 5, "nm");
+				g.addNumericField("Reconstruction size (initial)", ini_reconstruction_pixel_size, 0, 5, "nm");
+				g.addCheckbox("Show control panel", show_control_panel);
+				
+				((Checkbox)g.getCheckboxes().get(0)).hide();
+				
 				g.showDialog();
+
+
 				ps = g.getNextNumber();
+
+				ini_FWHM = g.getNextNumber();
+				ini_reconstruction_pixel_size=g.getNextNumber();
+				show_control_panel=g.getNextBoolean();
 			}
 
 			//Yay @ cargoculting
@@ -153,19 +169,41 @@ public class  ThreeBLoader implements PlugIn {
 			if(roi == null)
 				throw new IOException("corrupt file (no ROI)");
 
-			final String fname = name;
-			final Rectangle roi_ = roi;
-			final int its = iterations;
-			SwingUtilities.invokeLater(
-			new Runnable() {
-					public void run() {
-							EControlPanel e = new EControlPanel(roi_, pixel_size_in_nm_, fname, null);
-							e.append(spots, its);
-							e.send_update_canvas_event();
-							e.send_status_text_message("Using " + fname + ": " + Integer.toString(its) + " iterations.");
-					}
+
+			if(show_control_panel)
+			{
+				final String fname = name;
+				final Rectangle roi_ = roi;
+				final int its = iterations;
+				final double ini_FWHM_ = ini_FWHM;
+				final double ini_reconstruction_pixel_size_ = ini_reconstruction_pixel_size;
+				SwingUtilities.invokeLater(
+				new Runnable() {
+						public void run() {
+								EControlPanel e = new EControlPanel(roi_, pixel_size_in_nm_, fname, null);
+								e.append(spots, its);
+								e.send_update_canvas_event();
+								e.send_status_text_message("Using " + fname + ": " + Integer.toString(its) + " iterations.");
+								e.set_reconstructed_pixel_size(ini_reconstruction_pixel_size_);
+								e.set_reconstruction_blur_fwhm(ini_FWHM_);
+								e.send_update_canvas_event();
+						}
+
+				}
+				);
 			}
-			);
+			else
+			{
+				System.out.println("etf\n");
+				double zoom=ps / ini_reconstruction_pixel_size; 
+				ImagePlus   linear_reconstruction;
+				linear_reconstruction = new ImagePlus();
+				linear_reconstruction.setProcessor(Reconstruction.reconstruct(roi, zoom, ini_FWHM, ps, spots));
+				linear_reconstruction.show();
+
+
+
+			}
 
 
 

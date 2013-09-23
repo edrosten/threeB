@@ -883,6 +883,41 @@ class ExportButtonListener implements ActionListener
 	}
 }
 
+class Reconstruction
+{
+	///Compute a brand new reconstruction.
+	static FloatProcessor reconstruct(Rectangle roi, double zoom, double reconstruction_blur_fwhm, double pixel_size_in_nm, ArrayList<Spot> pts)
+	{
+		//Reconstruct an image which is based around the ROI in size
+		int xoff = (int)roi.x;
+		int yoff = (int)roi.y;
+
+		//Apparently combining a 1x1 rectangle at 0,0 and 24,24 gives a total width of... 24.
+		//lol.
+		int xsize = (int)Math.round((roi.width + 1) * zoom);
+		int ysize = (int)Math.round((roi.height + 1) * zoom);
+		
+		//New blank image set to zero
+		FloatProcessor reconstructed = new FloatProcessor(xsize, ysize);
+
+		for(int i=0; i < pts.size(); i++)
+		{
+			
+			//Increment the count 
+			int xc = (int)Math.floor((pts.get(i).x-xoff) * zoom + 0.5);
+			int yc = (int)Math.floor((pts.get(i).y-yoff) * zoom + 0.5);
+			float p = reconstructed.getPixelValue(xc, yc);
+			reconstructed.putPixelValue(xc, yc, p+1);
+		}
+
+		double blur_sigma = reconstruction_blur_fwhm / (2 * Math.sqrt(2 * Math.log(2))) * zoom / pixel_size_in_nm;
+
+		(new GaussianBlur()).blurGaussian(reconstructed, blur_sigma, blur_sigma, 0.005);
+		return reconstructed;
+	}
+}
+
+
 ///Control panel for running 3B plugin and providing interactive update.
 ///@ingroup gPlugin
 class EControlPanel extends JFrame implements WindowListener
@@ -914,6 +949,15 @@ class EControlPanel extends JFrame implements WindowListener
 	//Architecture is now getting quite messy.
 	private int iterations = 0;
 
+	
+	void set_reconstruction_blur_fwhm(double r)
+	{
+		blur_fwhm.setValue(r);
+	}
+	void set_reconstructed_pixel_size(double z)
+	{
+		reconstructed_pixel_size.setValue(z);
+	}
 	
 	EControlPanel(Rectangle roi_, double ps_, String filename_, ThreeBRunner tbr_)
 	{
@@ -1167,6 +1211,7 @@ class EControlPanel extends JFrame implements WindowListener
 	///Compute a brand new reconstruction.
 	private synchronized FloatProcessor reconstruct()
 	{
+	/*
 		//Reconstruct an image which is based around the ROI in size
 		int xoff = (int)roi.x;
 		int yoff = (int)roi.y;
@@ -1193,6 +1238,9 @@ class EControlPanel extends JFrame implements WindowListener
 
 		(new GaussianBlur()).blurGaussian(reconstructed, blur_sigma, blur_sigma, 0.005);
 		return reconstructed;
+		*/
+
+		return Reconstruction.reconstruct(roi, zoom, reconstruction_blur_fwhm, pixel_size_in_nm, pts);
 	}
 
 
