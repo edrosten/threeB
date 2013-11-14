@@ -2320,6 +2320,19 @@ class FitSpots
 			save_spots << " " << pixels[i].x << " " << pixels[i].y;
 		save_spots << endl;
 
+		//Check to see if a filter was set. If so, dump it out in an easy to parse format.
+		//Otherwise ignore it. The filter does not affect 3B in any way.
+		{
+			vector<ImageRef> filter = GV3::get<vector<ImageRef> >("filter", "", 1);
+			if(!filter.empty())
+			{
+				save_spots << "FILTER";
+				for(unsigned int i=0; i < filter.size(); i++)
+					save_spots << " " << filter[i].x << " " << filter[i].y;
+				save_spots << endl;
+			}
+		}
+
 		save_spots << "BEGINGVARLIST" << endl;
 		GV3::print_var_list(save_spots, "", 1);
 		save_spots << "ENDGVARLIST" << endl;
