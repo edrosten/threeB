@@ -35,13 +35,12 @@ vector<vector<ImageRef> > get_regions(const SubImage<double>& log_ratios)
 	//Set the liklihood ratio threshold/spot density prior
 	//same thing.
 	double threshold = GV3::get<double>("threshold", 0, -1);
-	int edge = GV3::get<int>("edge", 0, -1);
 
 
 	//Threshold image
 	Image<byte> thresholded(log_ratios.size(), 0);
 	for(int r=0; r < thresholded.size().y; r++)
-		for(int c=0; c < min(thresholded.size().x, edge); c++)
+		for(int c=0; c < thresholded.size().x; c++)
 			thresholded[r][c] = 255 * (log_ratios[r][c] > threshold);
 	
 	//Dilate
@@ -52,7 +51,7 @@ vector<vector<ImageRef> > get_regions(const SubImage<double>& log_ratios)
 	//Connected components of dilated image
 	vector<ImageRef> fg;
 	for(int r=0; r < thresholded.size().y; r++)
-		for(int c=0; c < min(thresholded.size().x, edge); c++)
+		for(int c=0; c < thresholded.size().x; c++)
 			if(dilated[r][c])
 				fg.push_back(ImageRef(c, r));
 
