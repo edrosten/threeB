@@ -1431,6 +1431,7 @@ class FitSpots
 	const int outer_loop_iterations;   ///< Total number of iterations to perform
 	const int optimization_version;    ///< Which version? NatMeth (1) or bugfixed (2)
 	const int allowed_consecutive_empty;///<Quit after this many empty consecutive models. 0 or fewer means never quit.
+	const int empty_model_max_spots    ;///<This many spots or fewer counts as an empty model.
 	
 	//Spot selection loop
 	const int add_remove_tries;        ///< Number of attemts to add/remove a spot
@@ -1517,6 +1518,7 @@ class FitSpots
 	 outer_loop_iterations(GV3::get<int>("main.total_iterations", 100000000, 1)),
 	 optimization_version(GV3::get<int>("main.optimization_version", 0, -1)),
 	 allowed_consecutive_empty(GV3::get<int>("main.consecutive_empty_models", 0, 1)),
+	 empty_model_max_spots(GV3::get<int>("main.empty_model.max_size", 0, 1)),
 	 
 	 //Spot selection loop
 	 add_remove_tries(GV3::get<int>("add_remove.tries", 0, -1)),
@@ -2366,7 +2368,7 @@ class FitSpots
 			//spot_intensities is be correct here!
 			try_modifying_model();
 
-			if(spots.size() == 0)
+			if((int)spots.size() <= empty_model_max_spots)
 				consecutive_empty_models++;
 			else
 				consecutive_empty_models = 0;
