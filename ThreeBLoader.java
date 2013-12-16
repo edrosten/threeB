@@ -21,6 +21,34 @@ import java.lang.InterruptedException;
 import java.lang.System;
 import java.lang.Math.*;
 
+class XYPair
+{
+	public int x, y;
+
+	@Override
+	public boolean equals(Object o)
+	{
+		XYPair p = (XYPair)o;
+		return p.x == x && p.y == y;
+	}
+
+	int hash(int x) 
+	{     
+		x = ((x >> 16) ^ x) * 0x45d9f3b;     
+		x = ((x >> 16) ^ x) * 0x45d9f3b;     
+		x = ((x >> 16) ^ x);     
+		return x; 
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int seed = hash(x);
+		seed ^= hash(y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+		return seed;
+	}
+};
+
 ///Plugin class to load up an old 3B run.
 ///
 ///@ingroup gPlugin
@@ -48,6 +76,7 @@ public class  ThreeBLoader implements PlugIn {
 		double ps;
 		double ini_FWHM=100., ini_reconstruction_pixel_size=10.;
 		boolean show_control_panel=true;
+		boolean do_filtering=true;
 
 		try{
 
@@ -88,9 +117,10 @@ System.out.println("yoyoyo:" + arg);
 				g.addNumericField("Pixel size", 100., 0, 5, "nm");
 				g.addNumericField("FWHM (initial) ", ini_FWHM, 0, 5, "nm");
 				g.addNumericField("Reconstruction size (initial)", ini_reconstruction_pixel_size, 0, 5, "nm");
+				g.addCheckbox("Do Filtering", do_filtering);
 				g.addCheckbox("Show control panel", show_control_panel);
 				
-				((Checkbox)g.getCheckboxes().get(0)).hide();
+				((Checkbox)g.getCheckboxes().get(1)).hide();
 				
 				g.showDialog();
 
@@ -99,6 +129,7 @@ System.out.println("yoyoyo:" + arg);
 
 				ini_FWHM = g.getNextNumber();
 				ini_reconstruction_pixel_size=g.getNextNumber();
+				do_filtering = g.getNextBoolean();
 				show_control_panel=g.getNextBoolean();
 			}
 
@@ -111,6 +142,8 @@ System.out.println("yoyoyo:" + arg);
 			int iterations=0;
 			Rectangle roi=null;
 			final double pixel_size_in_nm_ = ps;
+
+			HashSet<XYPair> filter_hash = new HashSet<XYPair>();
 
 			while((line = r.readLine()) != null)
 			{
@@ -141,6 +174,31 @@ System.out.println("yoyoyo:" + arg);
 					}
 				}
 
+				if(tokens[0].equals("FILTER"))
+				{
+					if((tokens.length - 1)%2 != 0)
+						throw new IOException("corrupt file (bad filter line)");
+					filter_hash.clear();
+
+					for(int i=1; i < tokens.length; i+= 2)
+					{
+						XYPair xy = new XYPair();
+						try
+						{
+							xy.x = Integer.parseInt(tokens[i+0]);
+							xy.y = Integer.parseInt(tokens[i+1]);
+						}
+						catch(NumberFormatException nerr)
+						{
+							throw new IOException("corrupt file (bad filter coordinate)");
+						}
+						
+						filter_hash.add(xy);
+					}
+
+					System.out.println(filter_hash);
+				}
+
 				if(tokens[0].matches("PASS[0-9]+:"))
 				{
 					iterations++;
@@ -160,8 +218,17 @@ System.out.println("yoyoyo:" + arg);
 						{
 							throw new IOException("corrupt file (bad spot position)");
 						}
-
-						spots.add(s);
+						
+						if(!do_filtering)
+							spots.add(s);
+						else
+						{
+							XYPair xy = new XYPair();
+							xy.x = (int)Math.floor(s.x);
+							xy.y = (int)Math.floor(s.y);
+							if(filter_hash.contains(xy))
+								spots.add(s);
+						}
 					}
 				}
 
