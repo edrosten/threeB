@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 {	
 	GUI.parseArguments(argc, argv);
 
-	float dilate = GV3::get<float>("radius", 0, -1);
+	float dilate = 0;
 	int size = GV3::get<int>("size", 0, -1);
 
 	Image<byte> im = img_load(GV3::get<string>("image"));
@@ -27,7 +27,13 @@ int main(int argc, char** argv)
 	final.zero();
 	int n=0;
 
-	string mask_str = GV3::get<string>("mask", "", -1);
+	string mask_str = GV3::get<string>("mask", "", 1);
+
+	if(mask_str != "")
+	{
+		dilate = GV3::get<float>("radius", 0, -1);
+	}
+
 	string filt_str = GV3::get<string>("filter", "", -1);
 
 	for(int y=0; y < im.size().y-size; y += size)
@@ -53,10 +59,14 @@ int main(int argc, char** argv)
 						for(int j=0; j < size; j++)
 							final[y+j][x+i] = 255;
 
-					morphology(filter, disc, Morphology::Dilate<byte>(), mask);
-
-					img_save(mask, sPrintf(mask_str, n));
 					img_save(filter, sPrintf(filt_str, n));
+
+					if(mask_str != "")
+					{
+						morphology(filter, disc, Morphology::Dilate<byte>(), mask);
+						img_save(mask, sPrintf(mask_str, n));
+					}
+
 					n++;
 
 				}
