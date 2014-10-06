@@ -3,6 +3,7 @@
 #include <cvd/morphology.h>
 #include <gvars3/instances.h>
 #include <tag/printf.h>
+#include <climits>
 
 using namespace CVD;
 using namespace std;
@@ -35,9 +36,47 @@ int main(int argc, char** argv)
 	}
 
 	string filt_str = GV3::get<string>("filter", "", -1);
+	
+	int best_cells_filled = INT_MAX, bestxoff=0, bestyoff = 0;
+	
+	//Find the optiml offset
+	for(int yoff=0; yoff < size; yoff++)
+		for(int xoff=0; xoff < size; xoff++)
+		{
+			int cells_filled=0;
+			for(int y=yoff; y < im.size().y-size; y += size)
+				for(int x=xoff; x < im.size().x-size; x += size)
+				{
+					if(x-d >= 0 && x+d < im.size().x && y-d >= 0 && y+d < im.size().y)
+					{
+						for(int i=0; i < size; i++)
+							for(int j=0; j < size; j++)
+							{
+								if(im[y+j][x+i])
+								{
+									cells_filled++;
+									goto cont;
+								}
+							}
+					}	
+					cont:;
+				}
 
-	for(int y=0; y < im.size().y-size; y += size)
-		for(int x=0; x < im.size().x-size; x += size)
+			clog << "Testing " << xoff << ", " << yoff << " " << cells_filled << "\n";
+
+			if(cells_filled < best_cells_filled)
+			{
+				best_cells_filled = cells_filled;
+				bestxoff = xoff;
+				bestyoff = yoff;
+			}
+		}
+
+	clog << "---------\n";
+	clog << "Using " << best_cells_filled << ", " << bestyoff << " --> " << best_cells_filled << endl;
+
+	for(int y=bestyoff; y < im.size().y-size; y += size)
+		for(int x=bestxoff; x < im.size().x-size; x += size)
 			if(x-d >= 0 && x+d < im.size().x && y-d >= 0 && y+d < im.size().y)
 			{
 				filter.zero();
