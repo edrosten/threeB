@@ -39,6 +39,7 @@ int main(int argc, char** argv)
 	
 	int best_cells_filled = INT_MAX, bestxoff=0, bestyoff = 0;
 	
+	int cells_00=-1;	
 	//Find the optiml offset
 	for(int yoff=0; yoff < size; yoff++)
 		for(int xoff=0; xoff < size; xoff++)
@@ -62,7 +63,9 @@ int main(int argc, char** argv)
 					cont:;
 				}
 
-			clog << "Testing " << xoff << ", " << yoff << " " << cells_filled << "\n";
+			//clog << "Testing " << xoff << ", " << yoff << " " << cells_filled << "\n";
+			if(cells_00 == -1)
+				cells_00 = cells_filled;
 
 			if(cells_filled < best_cells_filled)
 			{
@@ -72,8 +75,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-	clog << "---------\n";
-	clog << "Using " << best_cells_filled << ", " << bestyoff << " --> " << best_cells_filled << endl;
+	clog << "Using " << best_cells_filled << ", " << bestyoff << " Cells= " << best_cells_filled <<  " ( default=" << cells_00 << ") " << endl;
 
 	for(int y=bestyoff; y < im.size().y-size; y += size)
 		for(int x=bestxoff; x < im.size().x-size; x += size)
