@@ -80,7 +80,6 @@ public class  ThreeBLoader implements PlugIn {
 
 		try{
 
-System.out.println("yoyoyo:" + arg);
 			if(arg.equals("test"))
 			{
 				name = "test_data.txt";
@@ -226,7 +225,7 @@ System.out.println("yoyoyo:" + arg);
 							XYPair xy = new XYPair();
 							xy.x = (int)Math.floor(s.x);
 							xy.y = (int)Math.floor(s.y);
-							if(filter_hash.contains(xy))
+							if(filter_hash.isEmpty() || filter_hash.contains(xy))
 								spots.add(s);
 						}
 					}
