@@ -106,56 +106,57 @@ void mmain(int argc, char** argv)
 		fit_spots_new(ims, p, save_spots, *null_graphics());
 
 	}
-	 
-	vector<Image<float> > ims = load_and_normalize_images(files);
-
-	//Load the log_ratios image.
-	//We will use this as a starting point for searching for spots.
-	Image<double> log_ratios;
-	try
-	{
-		log_ratios = img_load(GV3::get<string>("log_ratios", "", -1));
-	}
-	catch(Exceptions::All e)
-	{
-		cerr << "Error loading " << GV3::get<string>("log_ratios", "") << ": " << e.what << endl;
-		exit(1);
-	}
-	
-	
-	gvar3<int> cluster_to_show("cluster_to_show", 0, -1);
-	gvar3<int> use_largest("use_largest", 0, 1);
-
-	vector<vector<ImageRef> > regions;
-
-	regions = get_regions(log_ratios);
-	if(regions.size() == 0)
-	{
-		cerr << "There are no regions!\n";
-
-		ofstream save_spots;
-		open_or_die(save_spots, save_spots_file);
-		save_spots << "NOREGIONS\n";
-
-		exit(1);
-	}
-	
-	if(*use_largest && !regions.empty())
-	{
-		*cluster_to_show=0;
-		for(unsigned int i=1; i < regions.size(); i++)
-			if(regions[i].size() > regions[*cluster_to_show].size())
-				*cluster_to_show = i;
-				
-	}
 	else
-		*cluster_to_show = max(min(*cluster_to_show, (int)regions.size() - 1), 0);
+	{
+		vector<Image<float> > ims = load_and_normalize_images(files);
 
-	
-	auto_ptr<FitSpotsGraphics> gr = null_graphics();
-	place_and_fit_spots(ims, regions[*cluster_to_show], log_ratios, save_spots_file, *gr);
+		//Load the log_ratios image.
+		//We will use this as a starting point for searching for spots.
+		Image<double> log_ratios;
+		try
+		{
+			log_ratios = img_load(GV3::get<string>("log_ratios", "", -1));
+		}
+		catch(Exceptions::All e)
+		{
+			cerr << "Error loading " << GV3::get<string>("log_ratios", "") << ": " << e.what << endl;
+			exit(1);
+		}
+
+
+		gvar3<int> cluster_to_show("cluster_to_show", 0, -1);
+		gvar3<int> use_largest("use_largest", 0, 1);
+
+		vector<vector<ImageRef> > regions;
+
+		regions = get_regions(log_ratios);
+		if(regions.size() == 0)
+		{
+			cerr << "There are no regions!\n";
+
+			ofstream save_spots;
+			open_or_die(save_spots, save_spots_file);
+			save_spots << "NOREGIONS\n";
+
+			exit(1);
+		}
+		
+		if(*use_largest && !regions.empty())
+		{
+			*cluster_to_show=0;
+			for(unsigned int i=1; i < regions.size(); i++)
+				if(regions[i].size() > regions[*cluster_to_show].size())
+					*cluster_to_show = i;
+					
+		}
+		else
+			*cluster_to_show = max(min(*cluster_to_show, (int)regions.size() - 1), 0);
+
+		
+		auto_ptr<FitSpotsGraphics> gr = null_graphics();
+		place_and_fit_spots(ims, regions[*cluster_to_show], log_ratios, save_spots_file, *gr);
+	}
 }
-
 	
 int main(int argc, char** argv)
 {
