@@ -1605,7 +1605,7 @@ class ThreeBRunner implements Runnable
 		//that contains the paths. If that field is set to null, it is
 		//initialized automatically.  Therefore forcing that field to null will
 		//result into the reevaluation of the library path as soon as
-		//loadLibrary() is called…
+		//loadLibrary() is called...
 		
 		UnsatisfiedLinkError err;
 		try{
