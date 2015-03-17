@@ -1600,7 +1600,7 @@ class ThreeBRunner implements Runnable
 		// From http://blog.cedarsoft.com/tag/java-library-path/
 		//
 		//Explanation At first the system property is updated with the new
-		//value. This might be a relative path – or maybe you want to create
+		//value. This might be a relative path - or maybe you want to create
 		//that path dynamically. The Classloader has a static field (sys_paths)
 		//that contains the paths. If that field is set to null, it is
 		//initialized automatically.  Therefore forcing that field to null will
