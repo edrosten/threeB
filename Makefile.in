@@ -76,7 +76,7 @@ multispot5_jni.o:ThreeBRunner.h
 libthreeB_jni.so:multispot5_jni.o $(basic_objs)
 	g++ -shared -o libthreeB_jni.so $^ $(PLUGIN_LIBS)
 
-three_B.jar: three_B.class  jar/plugins.config jar/multispot5.cfg LoadTestData.class ThreeBHelp.class ClassicGlow.class ThreeBLoader.class
+three_B.jar: three_B.class  jar/plugins.config jar/multispot5.cfg LoadTestData.class ThreeBHelp.class ClassicGlow.class ThreeBLoader.class QuickPalmLoader.class
 	jar cvfM three_B.jar -C jar/ .
 
 %.class: %.java
