@@ -104,7 +104,6 @@ define([TEST_AND_SET_CXXFLAG],[
 TEST_AND_SET_CXXFLAG(-Wall)
 TEST_AND_SET_CXXFLAG(-Wextra)
 TEST_AND_SET_CXXFLAG(-W)
-TEST_AND_SET_CXXFLAG(-march=native)
 TEST_AND_SET_CXXFLAG(-fPIC)
 
 if ! echo $host | grep mingw
