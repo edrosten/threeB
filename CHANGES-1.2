@@ -1,0 +1,49 @@
+Summary of changes for Version 1.2 
+==================================
+
+New features
+------------
+
+* ImageJ plugin can now reconstruct QuickPalm runs as well as 3B runs
+
+* Program for splitting large marked areas into a grid for parallel processing.
+  See: http://superresolved.com/viewtopic.php?f=10&t=30218
+  - Split large masks up into small ones
+  - Automatically dilate masks to create overlap
+  - Reconstruction supports filtering to properly reconstruct overlapping regions
+
+* Abort the computation early if the model size is too small for too long.
+  - New parameters are:
+      main.consecutive_empty_models
+      main.empty_model.max_size
+ 
+* Release version inclues statically compiled 32 and 64 bit linux executables
+  for use on clusters as well as plugin and code.
+
+* Log files now embed the 3B version number
+
+* Automatic system for building plugin and executables from stable Ubuntu LTS 
+  releases.
+  - From any Debian based system (debootstrap required!), type:
+      sudo bash build_plugin.sh  
+
+* ImageJ plugin for 64 bit Windows
+
+
+
+Bugs fixed
+----------
+
+* ImageJ plugin supports ImageJ scripts properly now.
+
+* Fixed annoying rounding bug which made reconstructed images harder to align
+* with the originals
+
+* Fix bug in main optimization algorithm which drastically reduced the efficiency
+  - Note this changes the algorithm so the results are not the same as before
+  - The original algorithm is still available. Choose using:
+      main.optimization_version
+
+* Precompiled binary now works on older AMD x86-64 processors (such as Phenom II X6)
+
+* Occasional incorrect behaviour on continuing stopped runs
