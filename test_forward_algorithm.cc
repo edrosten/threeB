@@ -7,7 +7,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <cassert>
-#include <tag/stdpp.h>
 #include <cvd/cpu_hacks.h>
 
 #include "forward_algorithm.h"
@@ -17,9 +16,58 @@
 
 using namespace std;
 using namespace CVD;
-using namespace tag;
 using namespace std::tr1;
 using namespace TooN;
+
+
+const float exps_0_15[16]=
+{
+	expf(- 0),
+	expf(- 1),
+	expf(- 2),
+	expf(- 3),
+	expf(- 4),
+	expf(- 5),
+	expf(- 6),
+	expf(- 7),
+	expf(- 8),
+	expf(- 9),
+	expf(-10),
+	expf(-11),
+	expf(-12),
+	expf(-13),
+	expf(-14),
+	expf(-15),
+};
+
+
+
+float foo_exp2a(float n)
+{
+	//Input in the range  0 to -large
+	//only needs to be accurate relative to 1
+
+	//exp(a+b) = exp(a) exp(b)
+
+	//flt_epsilon = 1e-7
+	//and exp(-16) = 1.1254e-07
+	//so any exps this small when added to 1 will pretty much vanish.
+	if( n <= -16)
+		return 0;
+	
+	int fn = -ceil(n);
+	n += fn;
+	//n is between 0 and 1
+	n /=2;
+	
+	//n is between 0 and 1/16
+
+	return exps_0_15[fn] * (1 + n + n*n / 3 ) / (1-n + n*n/3);	
+
+}
+
+
+
 
 ///Observer which is the same as in hmm_test.cc
 struct HmmTestObservations
@@ -119,7 +167,11 @@ struct HmmTestObservations
 	{
 		vector<int> O;
 		for(unsigned int i=0; i < Q.size(); i++)
-			O.push_back(select_random_element(B[Q[i]]));
+		{
+			Vector<3> a = B[Q[i]];
+			//;//O.push_back(select_random_element(B[Q[i]]));
+			O.push_back(select_random_element(a));
+		}
 
 		return O;
 	}
@@ -131,7 +183,7 @@ struct EvalHmmTestObservations
 	{
 		HmmTestObservations h;
 		h.parameters = x;
-		return forward_algorithm(h.A, h.pi, h, h.O);
+		return forward_algorithm_(h.A, h.pi, h, h.O, foo_exp2a, ln);
 	}
 
 };
@@ -160,4 +212,8 @@ int main()
 	cout << "------------- Numerical Derivatives---------------\n";
 	cout << debug_numerical_gradient(EvalHmmTestObservations(), makeVector(.6,.2,.2,.2,.1,.7)) << endl << endl;
 	cout << debug_numerical_hessian(EvalHmmTestObservations(), makeVector(.6, .2, .2, .2, .1, .7))  << endl;
+
+
+	cout << "\nValue:\n";
+	cout << EvalHmmTestObservations()(makeVector(.6, .2, .2, .2, .1, .7))  << endl;
 }

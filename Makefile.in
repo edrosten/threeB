@@ -49,6 +49,12 @@ clean:
 	rm -f $(PROGS) *.o jar/*.class ThreeBRunner.h three_B.jar libmultispot5_jni.so
 
 
+make_grid_markup: make_grid_markup.o
+	$(CXX) -o $@ $^ $(LDFLAGS)  $(LDLIBS)
+
+make_grid_markup_static: make_grid_markup.o
+	$(CXX) -o $@ $^ $(LDFLAGS_S)
+
 #Magic incantation to get MinGW to build a DLL
 MINGW=$(HOME)/mingw/lib/
 

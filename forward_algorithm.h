@@ -241,7 +241,7 @@ Run the forward algorithm and return the log probability.
 @param B \f$B\f$: A function object giving the (log) probability of an observation given a state.
 @returns the log probability of observing all the data.
 */
-template<int States, class Btype, class Otype> double forward_algorithm(TooN::Matrix<States> A, TooN::Vector<States> pi, const Btype& B, const std::vector<Otype>& O)
+template<int States, class Btype, class Otype, class Exp, class Log> double forward_algorithm_(TooN::Matrix<States> A, TooN::Vector<States> pi, const Btype& B, const std::vector<Otype>& O, const Exp& exp, const Log& ln)
 {
 	using namespace TooN;
 	using namespace std;
@@ -287,6 +287,11 @@ template<int States, class Btype, class Otype> double forward_algorithm(TooN::Ma
 	double log_prob = Z  + ln(sum);
 
 	return  log_prob;
+}
+
+template<int States, class Btype, class Otype > double forward_algorithm(TooN::Matrix<States> A, TooN::Vector<States> pi, const Btype& B, const std::vector<Otype>& O)
+{
+	return forward_algorithm_(A, pi, B, O, exp, ln);
 }
 
 

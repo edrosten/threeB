@@ -121,7 +121,7 @@ mkdir -p $downloaddir
 
 list="amd64_mingw32"
 list="amd64_static"
-list="i386 amd64 amd64_mingw32 amd64_mingw64 amd64_static"
+list="i386 amd64 amd64_mingw32 amd64_mingw64 amd64_static i386_static"
 #list="amd64_mingw64"
 
 #list=amd64_static
