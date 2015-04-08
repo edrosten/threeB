@@ -121,7 +121,7 @@ mkdir -p $downloaddir
 
 list="amd64_mingw32"
 list="amd64_static"
-list="i386 amd64 amd64_mingw32 amd64_mingw64 amd64_static"
+list="i386 amd64 amd64_mingw32 amd64_mingw64 amd64_static i386_static"
 #list="amd64_mingw64"
 
 #list=amd64_static
@@ -414,12 +414,14 @@ FOO
 	if echo  $list | tr ' ' '\n' | grep -q amd64_static
 	then
 		cp $base/${distro}_amd64_static_build/tmp/$threebdir/multispot5_static $dist/multispot5_static_amd64_linux
+		cp $base/${distro}_amd64_static_build/tmp/$threebdir/make_grid_markup_static $dist/make_grid_markup_static_amd64_linux
 		check
 	fi
 
 	if echo  $list | tr ' ' '\n' | grep -q i386_static
 	then
 		cp $base/${distro}_i386_static_build/tmp/$threebdir/multispot5_static $dist/multispot5_static_i386_linux
+		cp $base/${distro}_i386_static_build/tmp/$threebdir/make_grid_markup_static $dist/make_grid_markup_static_i386_linux
 		check
 	fi
 

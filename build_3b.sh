@@ -29,7 +29,7 @@ then
 else
 	./configure $host
 	make clean
-	make $J multispot5_static
+	make $J multispot5_static make_grid_markup_static
 fi
 
 exit 0
