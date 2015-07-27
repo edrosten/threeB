@@ -38,11 +38,13 @@ then
 	host="--host i686-w64-mingw32  --without-pthread"
 	#Argh, the MingW *environment* provides the microsoft FPU control flags, but
 	#The cross environment doesn't! Define them here...
-	CC="i686-w64-mingw32-gcc -DUSE_CLOCK -D_EM_DENORMAL=0x00080000 -D_EM_UNDERFLOW=0x00000002 -D_EM_INEXACT=0x00000001  -D_MCW_EM=0x0008001F"
+	CC="i686-w64-mingw32-gcc"
+	LAPACK_CCFLAGS="-DUSE_CLOCK -D_EM_DENORMAL=0x00080000 -D_EM_UNDERFLOW=0x00000002 -D_EM_INEXACT=0x00000001  -D_MCW_EM=0x0008001F"
 
+	
 	AR=i686-w64-mingw32-ar 
-
 	prefdir=/tmp/mingw32
+	CVD_LIBS="-L$prefdir/lib -lz"
 
 	RANLIB=i686-w64-mingw32-ranlib
 	pref="--prefix=/tmp/mingw32"
@@ -57,9 +59,11 @@ then
 	host="--host x86_64-w64-mingw32  --without-pthread"
 	#Argh, the MingW *environment* provides the microsoft FPU control flags, but
 	#The cross environment doesn't! Define them here...
-	CC="x86_64-w64-mingw32-gcc -DUSE_CLOCK -D_EM_DENORMAL=0x00080000 -D_EM_UNDERFLOW=0x00000002 -D_EM_INEXACT=0x00000001  -D_MCW_EM=0x0008001F"
+	CC="x86_64-w64-mingw32-gcc"
+	LAPACK_CCFLAGS="-DUSE_CLOCK -D_EM_DENORMAL=0x00080000 -D_EM_UNDERFLOW=0x00000002 -D_EM_INEXACT=0x00000001  -D_MCW_EM=0x0008001F"
 
 	prefdir=/tmp/mingw64
+	CVD_LIBS="-L$prefdir/lib -lz"
 
 	AR=x86_64-w64-mingw32-ar 
 	RANLIB=x86_64-w64-mingw32-ranlib

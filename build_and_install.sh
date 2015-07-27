@@ -2,6 +2,45 @@
 
 
 
+if [ x$variant == xmingw32 ] || [ x$variant == xmingw64 ]
+then
+	echo AA1 Building jpeglib
+	cd /tmp/jpeg-9a
+	check
+	./configure $host $pref && make $J && make install 
+	check
+
+	echo AA2 Building zlib
+	cd /tmp/zlib-1.2.8
+	check
+
+
+	#Zlib is speshul. Too "cool" to use the "crap" autoconf or something, so naturally
+	#it's a pain to compile.
+	RANLIB="$RANLIB" AR="$AR" CC="$CC" ./configure --static $pref && make libz.a $J && make install
+	check
+
+	echo AA3 Building png
+	cd /tmp/libpng-1.6.18
+	check
+	LDFLAGS="-L$prefdir/lib -lz " ./configure $host $pref 
+	make $J
+	check
+	make install 
+	check
+
+	echo AA4 Building libtiff
+	cd /tmp/tiff-3.9.7
+	check
+	LDFLAGS="-L$prefdir/lib -lz " ./configure $host $pref
+	check
+	make $J
+	check
+	make install 
+	check
+fi
+
+
 
 
 cd /tmp/CLAPACK-3.2.1
@@ -10,7 +49,7 @@ patch make.inc <<FOO
 24c24
 < CC        = gcc
 ---
-> CC        = $CC
+> CC        = $CC $LAPACK_CCFLAGS
 27c27
 < CFLAGS    = -O3 -I\$(TOPDIR)/INCLUDE
 ---
@@ -85,10 +124,11 @@ check
 ./configure $host $pref --without-head --without-lang && make $J && make install 
 check
 
+
 echo AAc Building and installing libcvd
 cd /tmp/$CVD
 check
-./configure $host $pref --disable-fast7 --disable-fast8 --disable-fast9 --disable-fast10 --disable-fast11 --disable-fast12 && make $J && make install 
+LIBS="$CVD_LIBS" ./configure $host $pref --disable-fast7 --disable-fast8 --disable-fast9 --disable-fast10 --disable-fast11 --disable-fast12 && make $J && make install 
 check
 
 /sbin/ldconfig

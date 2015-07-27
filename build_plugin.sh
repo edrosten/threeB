@@ -81,7 +81,7 @@ GVARS=$GVARSNAME.tar.gz
 
 
 
-#set -x
+set -x
 mkdir -p $base
 
 function check()
@@ -116,6 +116,22 @@ mkdir -p $downloaddir
 
 	[ -f ij145.zip ] || wget http://rsbweb.nih.gov/ij/download/zips/ij145.zip
 	check
+
+
+
+	[ -f jpegsrc.v9a.tar.gz ] || wget http://www.ijg.org/files/jpegsrc.v9a.tar.gz
+	check
+
+	[ -f libpng-1.6.18.tar.xz  ] ||  wget ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.18.tar.xz
+	check
+
+	[ -f tiff-3.9.7.tar.gz ] || wget ftp://ftp.remotesensing.org/pub/libtiff/tiff-3.9.7.tar.gz
+	check
+
+	[ -f zlib-1.2.8.tar.gz ] || wget http://zlib.net/zlib-1.2.8.tar.gz
+	check
+
+
 )
 
 
@@ -328,6 +344,26 @@ function execute_build()
 
 					if [ x$variant == xmingw32 ] || [ x$variant == xmingw64 ]
 					then
+						cp $downloaddir/jpegsrc.v9a.tar.gz .
+						check
+						tar -xzf jpegsrc.v9a.tar.gz 
+						check
+						
+						cp $downloaddir/libpng-1.6.18.tar.xz .
+						check
+						tar -xJf libpng-1.6.18.tar.xz
+						check
+
+						cp $downloaddir/tiff-3.9.7.tar.gz .
+						check
+						tar -xzf tiff-3.9.7.tar.gz
+						check
+						
+						cp $downloaddir/zlib-1.2.8.tar.gz .
+						check
+						tar -xvf zlib-1.2.8.tar.gz
+						check
+
 						mkdir java-win
 						check
 						cp ../usr/lib/jvm/java-6-openjdk-amd64/include/jni.h java-win
@@ -445,16 +481,17 @@ FOO
 	if echo  $list | tr ' ' '\n' | grep -q 'mingw32$'
 	then
 		cp $base/${distro}_amd64_mingw32_build/tmp/$threebdir/threeB_jni.dll $dist/threeB_jni_32.dll
+		cp $base/${distro}_amd64_mingw32_build/tmp/$threebdir/multispot5_static $dist/multispot5_static_i386_win32.exe
 		check
 	fi
 
 	if echo  $list | tr ' ' '\n' | grep -q 'mingw64$'
 	then
 		cp $base/${distro}_amd64_mingw64_build/tmp/$threebdir/threeB_jni.dll $dist/threeB_jni_64.dll
+		cp $base/${distro}_amd64_mingw64_build/tmp/$threebdir/multispot5_static $dist/multispot5_static_amd64_win64.exe
 		check
 	fi
 }
-
 
 export distro=precise
 export list="i386 amd64 amd64_mingw32 amd64_mingw64"
@@ -464,6 +501,10 @@ export list="amd64_static i386_static"
 export distro=lucid
 execute_build
 
+
+#export distro=precise
+#export list="amd64_mingw64"
+#execute_build
 
 
 echo $dist

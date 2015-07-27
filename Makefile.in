@@ -19,7 +19,7 @@ else
 endif
 
 LDFLAGS_S=$(STATIC_PART) $(DYNAMIC_PART)
-LDFLAGS_S=-static -lcvd -ljpeg -lGVars3_headless -llapack -lblas -lf2c -lpng -ltiff -lz 
+LDFLAGS_S=$(LDFLAGS) -static -lcvd -ljpeg -lGVars3_headless -llapack -lblas -lf2c -lpng -ltiff -lz 
 
 
 PROGS=multispot5_headless three_B.jar libmultispot5_jni.so
