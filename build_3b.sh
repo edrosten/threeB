@@ -20,7 +20,7 @@ then
 
 	if [ x$variant == xmingw32 ] || [ x$variant == xmingw64 ]
 	then
-		make $J threeB_jni.dll
+		make $J threeB_jni.dll multispot5_static
 	else
 		make $J libthreeB_jni.so
 		make $J three_B.jar

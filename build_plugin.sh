@@ -3,7 +3,7 @@ mirror=http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu/
 distro=precise
 branch=`git branch | awk '/\*/{print $2}'`
 
-if ! git status | awk '$2=="modified:"{exit 1}'
+if ! git status | awk '$1=="modified:"{exit 1}'
 then
 	echo "There are uncommitted changes. This means that the build"
 	echo "Will not represent a sane version. Please commit all changes"
