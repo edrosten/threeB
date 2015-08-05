@@ -195,7 +195,7 @@ public class  ThreeBLoader implements PlugIn {
 						filter_hash.add(xy);
 					}
 
-					System.out.println(filter_hash);
+					//System.out.println(filter_hash);
 				}
 
 				if(tokens[0].matches("PASS[0-9]+:"))
@@ -260,12 +260,17 @@ public class  ThreeBLoader implements PlugIn {
 			}
 			else
 			{
-				System.out.println("etf\n");
-				double zoom=ps / ini_reconstruction_pixel_size; 
-				ImagePlus   linear_reconstruction;
-				linear_reconstruction = new ImagePlus();
-				linear_reconstruction.setProcessor(Reconstruction.reconstruct(roi, zoom, ini_FWHM, ps, spots));
-				linear_reconstruction.show();
+				//System.out.println("etf\n");
+				double zoom=ps / ini_reconstruction_pixel_size;
+				ImageProcessor export = Reconstruction.reconstruct(roi, zoom, ini_FWHM, ps, spots).duplicate();
+				ImagePlus   export_win;
+				export_win = new ImagePlus(name + " reconstruction", export);
+				export_win.getCalibration().pixelWidth = ini_reconstruction_pixel_size;
+				export_win.getCalibration().pixelHeight = ini_reconstruction_pixel_size;
+				export_win.getCalibration().setXUnit("nm");
+				export_win.getCalibration().setYUnit("nm");
+
+				export_win.show();
 
 
 
