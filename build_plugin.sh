@@ -489,13 +489,13 @@ FOO
 }
 
 export distro=precise
-export list="i386 amd64 amd64_mingw32 amd64_mingw64"
 export list="i386 amd64_mingw64" #i386 required for JAR file
+export list="i386 amd64 amd64_mingw32 amd64_mingw64"
 execute_build
 
-#export list="amd64_static i386_static"
-#export distro=lucid
-#execute_build
+export list="amd64_static i386_static"
+export distro=lucid
+execute_build
 
 
 #export distro=precise
