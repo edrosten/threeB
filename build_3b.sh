@@ -19,7 +19,7 @@ then
 
 	if [ x$variant == xmingw32 ] || [ x$variant == xmingw64 ]
 	then
-		LDFLAGS="$LDFLAGS -lpng -ltiff -ljpeg -lz" LIBS="-lpng -ltiff -ljpeg -lz" ./configure $host --with-imagej=/tmp/ImageJ/ij.jar $jni
+		LDFLAGS="$LDFLAGS -Wl,-Bstatic " LIBS="-lpng -ltiff -ljpeg -lz" ./configure $host --with-imagej=/tmp/ImageJ/ij.jar $jni
 		make clean
 		make $J threeB_jni.dll multispot5_static
 	else
