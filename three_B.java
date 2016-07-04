@@ -10,6 +10,7 @@ import ij.io.*;
 import ij.plugin.*;
 import ij.plugin.filter.*;
 
+import java.awt.image.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.*;
@@ -913,6 +914,20 @@ class Reconstruction
 		double blur_sigma = reconstruction_blur_fwhm / (2 * Math.sqrt(2 * Math.log(2))) * zoom / pixel_size_in_nm;
 
 		(new GaussianBlur()).blurGaussian(reconstructed, blur_sigma, blur_sigma, 0.005);
+
+/*
+		//Make an image
+
+		int size =xsize;
+		
+		//New image
+		FloatProcessor reconstructed = new FloatProcessor(size, size);
+		for(int y=0; y < size; y++)
+			for(int x=0; x < size; x++)
+				if(x % 20 < 10 != y % 20 < 10)
+					reconstructed.putPixelValue(x, y, x * 255.0 / size);
+
+*/
 		return reconstructed;
 	}
 }
@@ -930,11 +945,15 @@ class EControlPanel extends JFrame implements WindowListener
 	private FloatSliderWithBox blur_fwhm;
 	private FloatSliderWithBox reconstructed_pixel_size;
 
-	private Panel complete;
+	private JPanel complete;
 	private JPanel buttons;
+	private JScrollPane scroll;
 
 	private ThreeBRunner tbr;
 	private ArrayList<Spot> pts;
+
+	private JLabel image_label;
+	private ImageIcon icon;
 
 
 	private Rectangle roi;
@@ -973,17 +992,27 @@ class EControlPanel extends JFrame implements WindowListener
 
 	
 		//Now generate the dialog box
-		complete = new Panel(new GridBagLayout());
+		complete = new JPanel(new GridBagLayout());
 
 		//Create the image viewer
 		linear_reconstruction = new ImagePlus();
 		linear_reconstruction.setProcessor(reconstruct());
-		canvas = new ImageCanvas(linear_reconstruction);
+	//	canvas = new ImageCanvas(linear_reconstruction);
 		
 		//Make the image scrollable. This seems to work, if the correct cargo-culting
 		//is performed with the gridbaglayout fill constraints. I don't really understand why.
-		ScrollPane scroll = new ScrollPane();
-		scroll.add(canvas);
+
+
+		BufferedImage im = new BufferedImage(100,100,BufferedImage.TYPE_BYTE_GRAY);
+		icon = new ImageIcon(im);
+		image_label = new JLabel(icon);
+		
+
+		scroll = new JScrollPane(image_label);
+		//scroll.add(image_label);
+
+		//scroll.add(canvas);
+
 		complete.add(scroll, canvas_pos());
 
 		//Create the status message
@@ -1139,15 +1168,16 @@ class EControlPanel extends JFrame implements WindowListener
 	{
 		reconstruction_blur_fwhm = blur_fwhm.getValue();
 
+
 		zoom = pixel_size_in_nm / reconstructed_pixel_size.getValue();
 
 		linear_reconstruction.setProcessor(reconstruct());
 		linear_reconstruction.updateImage();
 		linear_reconstruction.updateAndRepaintWindow();
-		canvas.repaint();	
+		//canvas.repaint();	
 		//Update the canvas size and viewport to prevent funny things with zooming.
-		canvas.setDrawingSize(linear_reconstruction.getWidth(), linear_reconstruction.getHeight());
-		canvas.setSourceRect(new Rectangle(linear_reconstruction.getWidth(), linear_reconstruction.getHeight()));
+		//canvas.setDrawingSize(linear_reconstruction.getWidth(), linear_reconstruction.getHeight());
+		//canvas.setSourceRect(new Rectangle(linear_reconstruction.getWidth(), linear_reconstruction.getHeight()));
 		//validate();
 		//pack();
 
@@ -1160,6 +1190,21 @@ class EControlPanel extends JFrame implements WindowListener
 			exportButton.setBackground(Color.RED);
 		}
 
+		
+		icon.setImage(linear_reconstruction.getImage());
+		image_label.setIcon(icon);
+		image_label.setSize(linear_reconstruction.getWidth(), linear_reconstruction.getHeight());
+
+
+		//Cargo culting...
+		//Without non resizing changes (i.e. blur) do not cause
+		//window repaints when both scrollbars are present. 
+		image_label.repaint();
+		scroll.repaint();
+
+		//Recompues scrollbars correctly.
+		//Don't have pack: that causes a resize!
+		validate();
 	}
 
 
