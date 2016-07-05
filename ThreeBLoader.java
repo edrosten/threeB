@@ -3,6 +3,7 @@ import ij.process.*;
 import ij.gui.*;
 import java.awt.*;
 import ij.plugin.*;
+import ij.measure.*;
 import ij.plugin.frame.*;
 import ij.plugin.filter.PlugInFilter;
 import ij.*;
@@ -70,6 +71,125 @@ public class  ThreeBLoader implements PlugIn {
 		}
 	}
 
+	private class Results
+	{
+		public ArrayList<Spot> spots;
+		public Rectangle roi;
+		public int its;
+	}
+
+	Results parse_stream(InputStream in, boolean do_filtering) throws IOException
+	{
+		//Yay @ cargoculting
+		InputStreamReader d = new InputStreamReader(in);
+		BufferedReader r = new BufferedReader(d);
+
+		String line;
+		final ArrayList<Spot> spots = new ArrayList<Spot>();
+		int iterations=0;
+		Rectangle roi=null;
+
+		HashSet<XYPair> filter_hash = new HashSet<XYPair>();
+
+		while((line = r.readLine()) != null)
+		{
+			String tokens[] = line.split("\\p{Space}+");
+
+			if(tokens[0].equals("PIXELS"))
+			{
+				if((tokens.length - 1)%2 != 0)
+					throw new IOException("corrupt file (bad pixels line)");
+
+				for(int i=1; i < tokens.length; i+= 2)
+				{
+					int x, y;
+					try
+					{
+						x = Integer.parseInt(tokens[i+0]);
+						y = Integer.parseInt(tokens[i+1]);
+					}
+					catch(NumberFormatException nerr)
+					{
+						throw new IOException("corrupt file (bad pixel coordinate)");
+					}
+
+					if(roi == null)
+						roi = new Rectangle(x, y, 1, 1);
+					else
+						roi.add(x, y);
+				}
+			}
+
+			if(tokens[0].equals("FILTER"))
+			{
+				if((tokens.length - 1)%2 != 0)
+					throw new IOException("corrupt file (bad filter line)");
+				filter_hash.clear();
+
+				for(int i=1; i < tokens.length; i+= 2)
+				{
+					XYPair xy = new XYPair();
+					try
+					{
+						xy.x = Integer.parseInt(tokens[i+0]);
+						xy.y = Integer.parseInt(tokens[i+1]);
+					}
+					catch(NumberFormatException nerr)
+					{
+						throw new IOException("corrupt file (bad filter coordinate)");
+					}
+
+					filter_hash.add(xy);
+				}
+
+				//System.out.println(filter_hash);
+			}
+
+			if(tokens[0].matches("PASS[0-9]+:"))
+			{
+				iterations++;
+
+				if((tokens.length - 1)%4 != 0)
+					throw new IOException("corrupt file (pad pass line)");
+
+				for(int i=1; i < tokens.length; i+= 4)
+				{
+					Spot s = new Spot();
+					try
+					{
+						s.x = Double.parseDouble(tokens[i+2]);
+						s.y = Double.parseDouble(tokens[i+3]);
+					}
+					catch(NumberFormatException nerr)
+					{
+						throw new IOException("corrupt file (bad spot position)");
+					}
+
+					if(!do_filtering)
+						spots.add(s);
+					else
+					{
+						XYPair xy = new XYPair();
+						xy.x = (int)Math.floor(s.x);
+						xy.y = (int)Math.floor(s.y);
+						if(filter_hash.isEmpty() || filter_hash.contains(xy))
+							spots.add(s);
+					}
+				}
+			}
+
+		}
+		if(roi == null)
+			throw new IOException("corrupt file (no ROI)");
+		
+		Results res = new Results();
+		res.spots = spots;
+		res.roi = roi;
+		res.its = iterations;
+
+		return res;
+	}
+
 	public void run(String arg) {
 		InputStream in = null;
 		String name;
@@ -94,6 +214,68 @@ public class  ThreeBLoader implements PlugIn {
 					return;
 				}
 				ps=100;
+			}
+			else if(arg.equals("convert"))
+			{
+				OpenDialog o = new OpenDialog("Open 3B run...", null);
+				name = o.getFileName();
+				
+				try{
+					in = new FileInputStream(o.getDirectory() + o.getFileName());
+				}
+				catch(java.io.FileNotFoundException ferr)
+				{
+					Toolkit.getDefaultToolkit().beep();
+					ij.IJ.showStatus("Error opening file: " + ferr.getMessage());
+					return;
+				}
+
+
+
+				GenericDialog g = new GenericDialog("Convert to text");
+				g.addNumericField("Pixel size", 100., 0, 5, "nm");
+				g.addMessage("Positions are either in pixels or nm");
+				g.addCheckbox("Positions in nm", true);
+				g.addCheckbox("Do Filtering", true);
+				g.addCheckbox("Show control panel", show_control_panel);
+				
+				((Checkbox)g.getCheckboxes().get(2)).hide();
+				
+				g.showDialog();
+
+
+				ps = g.getNextNumber();
+				boolean position_in_nm = g.getNextBoolean();
+				do_filtering = g.getNextBoolean();
+				show_control_panel=g.getNextBoolean();
+
+				Results res = parse_stream(in, do_filtering);
+
+				ResultsTable tab = new ResultsTable();
+
+				int row=0;
+				String unit;
+				if(position_in_nm)
+					unit = "(nm)";
+				else
+					unit = "(px)";
+
+				double mul = 1;
+				if(position_in_nm)
+					mul = ps;
+
+				for(int i=0; i < res.spots.size(); i++)
+				{
+					tab.incrementCounter();
+					tab.addValue("X " + unit, res.spots.get(i).x * mul);
+					tab.addValue("Y " + unit, res.spots.get(i).y * mul);
+					row++;
+				}
+
+				tab.showRowNumbers(false);
+				tab.show(name + " localisations");
+				//Yikes! This needs some refactoring.
+				return;
 			}
 			else
 			{
@@ -132,122 +314,21 @@ public class  ThreeBLoader implements PlugIn {
 				show_control_panel=g.getNextBoolean();
 			}
 
-			//Yay @ cargoculting
-			InputStreamReader d = new InputStreamReader(in);
-			BufferedReader r = new BufferedReader(d);
-
-			String line;
-			final ArrayList<Spot> spots = new ArrayList<Spot>();
-			int iterations=0;
-			Rectangle roi=null;
 			final double pixel_size_in_nm_ = ps;
-
-			HashSet<XYPair> filter_hash = new HashSet<XYPair>();
-
-			while((line = r.readLine()) != null)
-			{
-				String tokens[] = line.split("\\p{Space}+");
-
-				if(tokens[0].equals("PIXELS"))
-				{
-					if((tokens.length - 1)%2 != 0)
-						throw new IOException("corrupt file (bad pixels line)");
-
-					for(int i=1; i < tokens.length; i+= 2)
-					{
-						int x, y;
-						try
-						{
-							x = Integer.parseInt(tokens[i+0]);
-							y = Integer.parseInt(tokens[i+1]);
-						}
-						catch(NumberFormatException nerr)
-						{
-							throw new IOException("corrupt file (bad pixel coordinate)");
-						}
-
-						if(roi == null)
-							roi = new Rectangle(x, y, 1, 1);
-						else
-							roi.add(x, y);
-					}
-				}
-
-				if(tokens[0].equals("FILTER"))
-				{
-					if((tokens.length - 1)%2 != 0)
-						throw new IOException("corrupt file (bad filter line)");
-					filter_hash.clear();
-
-					for(int i=1; i < tokens.length; i+= 2)
-					{
-						XYPair xy = new XYPair();
-						try
-						{
-							xy.x = Integer.parseInt(tokens[i+0]);
-							xy.y = Integer.parseInt(tokens[i+1]);
-						}
-						catch(NumberFormatException nerr)
-						{
-							throw new IOException("corrupt file (bad filter coordinate)");
-						}
-						
-						filter_hash.add(xy);
-					}
-
-					//System.out.println(filter_hash);
-				}
-
-				if(tokens[0].matches("PASS[0-9]+:"))
-				{
-					iterations++;
-
-					if((tokens.length - 1)%4 != 0)
-						throw new IOException("corrupt file (pad pass line)");
-
-					for(int i=1; i < tokens.length; i+= 4)
-					{
-						Spot s = new Spot();
-						try
-						{
-							s.x = Double.parseDouble(tokens[i+2]);
-							s.y = Double.parseDouble(tokens[i+3]);
-						}
-						catch(NumberFormatException nerr)
-						{
-							throw new IOException("corrupt file (bad spot position)");
-						}
-						
-						if(!do_filtering)
-							spots.add(s);
-						else
-						{
-							XYPair xy = new XYPair();
-							xy.x = (int)Math.floor(s.x);
-							xy.y = (int)Math.floor(s.y);
-							if(filter_hash.isEmpty() || filter_hash.contains(xy))
-								spots.add(s);
-						}
-					}
-				}
-
-			}
-			if(roi == null)
-				throw new IOException("corrupt file (no ROI)");
-
-
+			final Results res = parse_stream(in, do_filtering);
+			
 			if(show_control_panel)
 			{
 				final String fname = name;
-				final Rectangle roi_ = roi;
-				final int its = iterations;
+				final Rectangle roi_ = res.roi;
+				final int its = res.its;
 				final double ini_FWHM_ = ini_FWHM;
 				final double ini_reconstruction_pixel_size_ = ini_reconstruction_pixel_size;
 				SwingUtilities.invokeLater(
 				new Runnable() {
 						public void run() {
 								EControlPanel e = new EControlPanel(roi_, pixel_size_in_nm_, fname, null);
-								e.append(spots, its);
+								e.append(res.spots, res.its);
 								e.send_update_canvas_event();
 								e.send_status_text_message("Using " + fname + ": " + Integer.toString(its) + " iterations.");
 								e.set_reconstructed_pixel_size(ini_reconstruction_pixel_size_);
@@ -262,7 +343,7 @@ public class  ThreeBLoader implements PlugIn {
 			{
 				//System.out.println("etf\n");
 				double zoom=ps / ini_reconstruction_pixel_size;
-				ImageProcessor export = Reconstruction.reconstruct(roi, zoom, ini_FWHM, ps, spots).duplicate();
+				ImageProcessor export = Reconstruction.reconstruct(res.roi, zoom, ini_FWHM, ps, res.spots).duplicate();
 				ImagePlus   export_win;
 				export_win = new ImagePlus(name + " reconstruction", export);
 				export_win.getCalibration().pixelWidth = ini_reconstruction_pixel_size;
