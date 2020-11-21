@@ -21,18 +21,21 @@ Relseaes
 http://www.coxphysics.com/3b/3B_releases/
 
 
-Building for a cluster
-----------------------
+Building
+--------
 
-If you wish to run 3B on a cluster, then you need to either build a static 
-executable or take care to copy all the dependencies. To build a static 
-executable, you will need a Linux machine and run:
+If you wish to run 3B on a cluster, then you need to either build a static
+executable or take care to copy all the dependencies. A script has been
+provided To build for all platforms. You will need a Linux machine. On ubuntu
+or debian, run:
 
 ```
+sudo apt install debootstrap
 sudo bash build_plugin.sh
 ```
 
-Note, you need to have the `debootstrap` program available.
+Note, you need to have the `debootstrap` program available, so you will need
+this from another source if you are not on Ubuntu.
 
 
 sudo access is needed since the script runs debootstrap which is used to make
