@@ -1,5 +1,5 @@
 base=/chroot
-mirror=http://www-uxsup.csx.cam.ac.uk/pub/linux/ubuntu/
+mirror=http://old-releases.ubuntu.com/ubuntu/
 distro=precise
 branch=`git branch | awk '/\*/{print $2}'`
 
@@ -81,7 +81,7 @@ GVARS=$GVARSNAME.tar.gz
 
 
 
-set -x
+set -ex
 mkdir -p $base
 
 function check()
@@ -122,13 +122,13 @@ mkdir -p $downloaddir
 	[ -f jpegsrc.v9a.tar.gz ] || wget http://www.ijg.org/files/jpegsrc.v9a.tar.gz
 	check
 
-	[ -f libpng-1.6.18.tar.xz  ] ||  wget ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.18.tar.xz
+	[ -f libpng-1.6.18.tar.xz  ] ||  wget https://download.sourceforge.net/libpng/libpng-1.6.18.tar.xz
 	check
 
-	[ -f tiff-3.9.7.tar.gz ] || wget ftp://ftp.remotesensing.org/pub/libtiff/tiff-3.9.7.tar.gz
+	[ -f tiff-3.9.7.tar.gz ] || wget https://download.osgeo.org/libtiff/tiff-3.9.7.tar.gz
 	check
 
-	[ -f zlib-1.2.8.tar.gz ] || wget http://zlib.net/zlib-1.2.8.tar.gz
+	[ -f zlib-1.2.8.tar.gz ] || wget http://prdownloads.sourceforge.net/libpng/zlib-1.2.8.tar.gz
 	check
 
 
@@ -169,43 +169,41 @@ function execute_build()
 
 	#First, create the base images if they do not exist.
 	echo "Creating base systems..."
-	for arch in amd64 i386
-	do
-		{
-			target=$base/${distro}_${arch}_base
+	arch=amd64  # i386
+	target=$base/${distro}_${arch}_base
 
 
-			if ! [ -e "$target" ]
-			then
-				echo "Need to install " $target
-				sleep 1
+	if ! [ -e "$target" ]
+	then
+		echo "Need to install " $target
+		sleep 1
 
-				sudo debootstrap --variant=buildd --arch $arch ${distro} $target $mirror
-				check
+		sudo debootstrap --no-check-gpg --variant=buildd --arch $arch ${distro} $target $mirror
+		check
 
-				sudo mount -o bind /proc $target/proc
-				check
+		sudo mount -o bind /proc $target/proc
+		check
 
-				sudo cp /etc/resolv.conf $target/etc/resolv.conf
-				check
+		sudo cp /etc/resolv.conf $target/etc/resolv.conf
+		check
 
-				sudo chroot $target locale-gen en_GB.UTF-8
-				check
+		sudo chroot $target locale-gen en_GB.UTF-8
+		check
 
-				sudo chroot $target apt-get install -y cvs openjdk-6-jdk cvs wget zip vim
-				check
+		sudo chroot $target apt-get install -y  --force-yes openjdk-6-jre-headless
+		check 
 
-				sudo umount $target/proc
-				check
+		sudo chroot $target apt-get install -y  --force-yes openjdk-6-jdk cvs wget zip vim
+		check
 
-			else
-				echo "$target already exists. Yay!"	
-			fi
-		}&
-	done
+		sudo umount $target/proc
+		check
 
-	wait
-	echo "Done with base systems"
+	else
+		echo "$target already exists. Yay!"	
+	fi
+
+	echo "Done with base system"
 	sleep 1
 
 	echo "Creating the individual development systems..."
@@ -228,8 +226,8 @@ function execute_build()
 
 				cp -a "$source" "$target"
 
-				sudo mount -o bind /proc $target/proc
-				check
+				#sudo mount -o bind /proc $target/proc
+				#check
 
 
 
@@ -241,7 +239,7 @@ function execute_build()
 					check
 					sudo chroot $target apt-get update
 					check
-					sudo chroot $target apt-get install -y libjpeg-dev libpng-dev libtiff-dev 
+					sudo chroot $target apt-get install -y --force-yes libjpeg-dev libpng-dev libtiff-dev 
 					check
 				fi
 
@@ -251,7 +249,7 @@ function execute_build()
 					check
 					sudo chroot $target apt-get update
 					check
-					sudo chroot $target apt-get install -y mingw-w64 g++-mingw-w64-i686
+					sudo chroot $target apt-get install -y --force-yes mingw-w64 g++-mingw-w64-i686
 					check
 				fi
 
@@ -261,12 +259,12 @@ function execute_build()
 					check
 					sudo chroot $target apt-get update
 					check
-					sudo chroot $target apt-get install -y mingw-w64 g++-mingw-w64-x86-64
+					sudo chroot $target apt-get install -y --force-yes mingw-w64 g++-mingw-w64-x86-64
 					check
 				fi
 
-				sudo umount $target/proc
-				check
+				#sudo umount $target/proc
+				#check
 
 			else
 				echo $target already exists. Yay.
@@ -489,11 +487,11 @@ FOO
 }
 
 export distro=precise
-export list="i386 amd64_mingw64" #i386 required for JAR file
-export list="i386 amd64 amd64_mingw32 amd64_mingw64"
+#export list="i386 amd64_mingw64" #i386 required for JAR file
+export list="amd64 amd64_mingw64"
 execute_build
 
-export list="amd64_static i386_static"
+export list="amd64_static"
 export distro=lucid
 execute_build
 
