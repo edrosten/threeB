@@ -54,6 +54,13 @@ TooN http://www.edwardrosten.com/cvd/toon.html
 libcvd http://www.edwardrosten.com/cvd/
 gvars3 http://www.edwardrosten.com/cvd/gvars3.html
 
+You currently need old versions (newer ones will work, but not too new)
+
+http://www.edwardrosten.com/cvd/libcvd-20121025.tar.gz
+http://www.edwardrosten.com/cvd/gvars-3.0.tar.gz
+http://www.edwardrosten.com/cvd/TooN-2.0.tar.gz
+
+
 License
 -------
 
