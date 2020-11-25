@@ -21,31 +21,45 @@ Relseaes
 http://www.coxphysics.com/3b/3B_releases/
 
 
-Building
---------
+Building the static executables
+-------------------------------
 
-If you wish to run 3B on a cluster, then you need to either build a static
-executable or take care to copy all the dependencies. A script has been
-provided To build for all platforms. You will need a Linux machine. On ubuntu
-or debian, run:
+The easiest and fastest way is using docker, so you need to get docker. Then go into
+your source directory and run:
+
+```
+docker run -v $PWD:/home/build edrosten/threeb-static-build-env ./configure
+docker run -v $PWD:/home/build edrosten/threeb-static-build-env make multispot5_static -j 8
+```
+
+
+Building the plugin (and static executables)
+--------------------------------------------
+
+This is the "classic" way of building 3B, and I haven't ported this over to docker
+yet. It does more or less the same thing, but predates docker by about 6 years or 
+so, so you need sudo access.
+
+You will need a Linux machine. On ubuntu or debian, run:
 
 ```
 sudo apt install debootstrap
 sudo bash build_plugin.sh
 ```
 
-Note, you need to have the `debootstrap` program available, so you will need
-this from another source if you are not on Ubuntu.
-
-
 sudo access is needed since the script runs debootstrap which is used to make
-some clean, consistent debian environments for a repeatable build. This is
-instead of using a system like Docker which was not widespread and mature when
-this was originally written.
+some clean, consistent debian environments for a repeatable build.
 
 
-Building
---------
+Building completely by hand
+---------------------------
+
+Don't do this unless you are really very confident and 100% sure you need it.
+
+Building the is done the usual way (`./configure && make`), but that's a little
+tricky these days because (1) building static binaries is quite hard and (2) I 
+wrote this in 2009 and released it in 2011, so it doesn't currently build on 
+new systems with up to date library versions.
 
 The usual ./configure && make can be used to build the software.
 The software depends on:
@@ -60,6 +74,9 @@ http://www.edwardrosten.com/cvd/libcvd-20121025.tar.gz
 http://www.edwardrosten.com/cvd/gvars-3.0.tar.gz
 http://www.edwardrosten.com/cvd/TooN-2.0.tar.gz
 
+You'll likely need an old compiler as well. The static executables will build with
+gcc-4.4.3. If you want to build the plugin, you'll need a newer MinGW environment.
+Building for MinGW is hard and requires patching then building dependencies.
 
 License
 -------

@@ -1,0 +1,20 @@
+24c24
+< CC        = gcc
+---
+> CC        = gcc
+27c27
+< CFLAGS    = -O3 -I$(TOPDIR)/INCLUDE
+---
+> CFLAGS    = -O3 -I$(TOPDIR)/INCLUDE -fPIC
+30c30
+< NOOPT     = -O0 -I$(TOPDIR)/INCLUDE
+---
+> NOOPT     = -O0 -I$(TOPDIR)/INCLUDE -fPIC
+53c53
+< ARCH     = ar
+---
+> ARCH     = ar
+55c55
+< RANLIB   = ranlib
+---
+> RANLIB   = ranlib

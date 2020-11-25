@@ -1,0 +1,43 @@
+Software Authors 
+----------------
+Edward Rosten 
+Susan Cox
+
+
+
+Authors on "Bayesian localisation microscopy reveals nanoscale podosome dynamics"
+---------------------------------------------------------------------------------
+
+Susan Cox
+Edward Rosten
+James Monypenny
+Tijana Jovanovic-Talisman
+Dylan T. Burnette
+Jennifer Lippincott-Schwartz
+Gareth E. Jones
+Rainer Heintzmann
+
+
+Authors on " ImageJ plugin for Bayesian analysis of blinking and bleaching"
+---------------------------------------------------------------------------
+
+Edward Rosten
+Gareth E. Jones
+Susan Cox
+
+
+
+Beta testers and general bug reporting
+--------------------------------------
+
+Jason Rogers
+Daniel Matthews
+Thomas Iskratsch
+Harri Jäälinoja
+
+
+
+Bug reports and fixes
+---------------------
+
+Fan Xu -- found errors in optimization routine.

@@ -1,0 +1,90 @@
+diff -cr CLAPACK-3.2.1/F2CLIBS/libf2c/Makefile CLAPACK-3.2.1.old/F2CLIBS/libf2c/Makefile
+*** CLAPACK-3.2.1/F2CLIBS/libf2c/Makefile	2010-04-27 19:09:35.000000000 +0000
+--- CLAPACK-3.2.1.old/F2CLIBS/libf2c/Makefile	2012-02-24 18:57:19.584315798 +0000
+***************
+*** 20,27 ****
+  # compile, then strip unnecessary symbols
+  .c.o:
+  	$(CC) -c -DSkip_f2c_Undefs $(CFLAGS) $*.c
+- 	ld -r -x -o $*.xxx $*.o
+- 	mv $*.xxx $*.o
+  ## Under Solaris (and other systems that do not understand ld -x),
+  ## omit -x in the ld line above.
+  ## If your system does not have the ld command, comment out
+--- 20,25 ----
+***************
+*** 72,79 ****
+  all: f2c.h signal1.h sysdep1.h libf2c.a clapack_install
+  
+  libf2c.a: $(OFILES)
+! 	ar r libf2c.a $?
+! 	-ranlib libf2c.a
+  
+  ## Shared-library variant: the following rule works on Linux
+  ## systems.  Details are system-dependent.  Under Linux, -fPIC
+--- 70,77 ----
+  all: f2c.h signal1.h sysdep1.h libf2c.a clapack_install
+  
+  libf2c.a: $(OFILES)
+! 	$(AR) r libf2c.a $?
+! 	-$(RANLIB) libf2c.a
+  
+  ## Shared-library variant: the following rule works on Linux
+  ## systems.  Details are system-dependent.  Under Linux, -fPIC
+diff -cr CLAPACK-3.2.1/Makefile CLAPACK-3.2.1.old/Makefile
+*** CLAPACK-3.2.1/Makefile	2010-04-27 19:09:35.000000000 +0000
+--- CLAPACK-3.2.1.old/Makefile	2012-02-24 19:01:56.124327524 +0000
+***************
+*** 28,34 ****
+  fblaswrap: 
+  	( cd BLAS/WRAP; $(MAKE) libfblaswr.a; cp libfblaswr.a ../.. )
+  
+! lapacklib:	lapack_install
+  	( cd SRC; $(MAKE) )
+  
+  variants:
+--- 28,34 ----
+  fblaswrap: 
+  	( cd BLAS/WRAP; $(MAKE) libfblaswr.a; cp libfblaswr.a ../.. )
+  
+! lapacklib:
+  	( cd SRC; $(MAKE) )
+  
+  variants:
+diff -cr CLAPACK-3.2.1/SRC/Makefile CLAPACK-3.2.1.old/SRC/Makefile
+*** CLAPACK-3.2.1/SRC/Makefile	2010-04-27 19:09:35.000000000 +0000
+--- CLAPACK-3.2.1.old/SRC/Makefile	2012-02-24 19:11:32.844351977 +0000
+***************
+*** 71,77 ****
+     slaset.o slasq1.o slasq2.o slasq3.o slasq4.o slasq5.o slasq6.o \
+     slasr.o  slasrt.o slassq.o slasv2.o spttrf.o sstebz.o sstedc.o \
+     ssteqr.o ssterf.o slaisnan.o sisnan.o \
+!    ../INSTALL/slamch.o ../INSTALL/second.o
+  
+  DZLAUX = \
+     dbdsdc.o \
+--- 71,77 ----
+     slaset.o slasq1.o slasq2.o slasq3.o slasq4.o slasq5.o slasq6.o \
+     slasr.o  slasrt.o slassq.o slasv2.o spttrf.o sstebz.o sstedc.o \
+     ssteqr.o ssterf.o slaisnan.o sisnan.o \
+!    ../INSTALL/slamch.o
+  
+  DZLAUX = \
+     dbdsdc.o \
+***************
+*** 88,94 ****
+     dlaset.o dlasq1.o dlasq2.o dlasq3.o dlasq4.o dlasq5.o dlasq6.o \
+     dlasr.o  dlasrt.o dlassq.o dlasv2.o dpttrf.o dstebz.o dstedc.o \
+     dsteqr.o dsterf.o dlaisnan.o disnan.o \
+!    ../INSTALL/dlamch.o ../INSTALL/dsecnd.o
+  
+  SLASRC = \
+     sgbbrd.o sgbcon.o sgbequ.o sgbrfs.o sgbsv.o  \
+--- 88,94 ----
+     dlaset.o dlasq1.o dlasq2.o dlasq3.o dlasq4.o dlasq5.o dlasq6.o \
+     dlasr.o  dlasrt.o dlassq.o dlasv2.o dpttrf.o dstebz.o dstedc.o \
+     dsteqr.o dsterf.o dlaisnan.o disnan.o \
+!    ../INSTALL/dlamch.o
+  
+  SLASRC = \
+     sgbbrd.o sgbcon.o sgbequ.o sgbrfs.o sgbsv.o  \
