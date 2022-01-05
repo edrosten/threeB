@@ -122,11 +122,11 @@ Image<float> average_image(const vector<Image<float> >& ims)
 	return r;
 }
 
-Image<byte> scale_to_bytes(const Image<float>& im, const double mult=1)
+Image<CVD::byte> scale_to_bytes(const Image<float>& im, const double mult=1)
 {
         float lo = *min_element(im.begin(), im.end());
         float hi = *max_element(im.begin(), im.end());
-        Image<byte> out(im.size());
+        Image<CVD::byte> out(im.size());
         for(int r=0; r < out.size().y-0; r++)
                 for(int c=0; c < out.size().x-0; c++)
                         out[r][c] = (int)min(255., floor( mult* ( (im[r][c]-lo)*255/(hi-lo))));
@@ -659,7 +659,7 @@ Rgb<byte> composite(const Rgba<byte>& fg, const Rgb<byte>& bg)
                      (bg.blue * (255 - fg.alpha) + fg.blue * fg.alpha)/255);
 }
 
-void dump_video(const ImageRef win_size, const vector<vector<Vector<4> > >& spots, const double scale, const Vector<2> offset, bool transparent, const Image<byte>& mean, double pixel_size, const vector<Image<byte> >& all_images)
+void dump_video(const ImageRef win_size, const vector<vector<Vector<4> > >& spots, const double scale, const Vector<2> offset, bool transparent, const Image<CVD::byte>& mean, double pixel_size, const vector<Image<CVD::byte> >& all_images)
 {
 	int video_number = ++GV3::get<int>("video_number", -1, 0);
 	string stub = GV3::get<string>("video_stub");
@@ -985,11 +985,11 @@ int main(int argc, char** argv)
 	vector<string> files(argv + lastarg, argv + argc);
 	vector<Image<float> > ims = load_and_preprocess_images(files);
 
-	vector<Image<byte> > all_images;
+	vector<Image<CVD::byte> > all_images;
 	for(unsigned int i=0; i < ims.size(); i++)
 		all_images.push_back(scale_to_bytes(ims[i]));
 
-	Image<byte> mean = scale_to_bytes(average_image(ims));
+	Image<CVD::byte> mean = scale_to_bytes(average_image(ims));
 	Image<float> av = average_image(ims);
 	cout << (int)*max_element(av.begin(), av.end()) << endl;
 

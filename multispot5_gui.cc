@@ -37,9 +37,9 @@ double lim(double x)
 }
 
 
-Image<byte> scale(const SubImage<double>& i, double ctr, double rng)
+Image<CVD::byte> scale(const SubImage<double>& i, double ctr, double rng)
 {
-	Image<byte> s(i.size());
+	Image<CVD::byte> s(i.size());
 	for(int r=0; r < i.size().y; r++)
 		for(int c=0; c < i.size().x; c++)
 			Pixel::DefaultConversion<float, byte>::type::convert(lim((i[r][c] - ctr)/rng), s[r][c]);
@@ -189,7 +189,7 @@ class GraphicsGL: public FitSpotsGraphics
 		}
 
 	
-		virtual void draw_krap(const vector<Vector<4> >& spots, const Image<byte>& im, const BBox& box, int N, Vector<4> s)
+		virtual void draw_krap(const vector<Vector<4> >& spots, const Image<CVD::byte>& im, const BBox& box, int N, Vector<4> s)
 		{
 
 			glDrawPixels(im);
@@ -268,13 +268,13 @@ vector<vector<ImageRef> > get_regions(const SubImage<double>& log_ratios)
 
 
 	//Threshold image
-	Image<byte> thresholded(log_ratios.size(), 0);
+	Image<CVD::byte> thresholded(log_ratios.size(), 0);
 	for(int r=0; r < thresholded.size().y; r++)
 		for(int c=0; c < min(thresholded.size().x, edge); c++)
 			thresholded[r][c] = 255 * (log_ratios[r][c] > threshold);
 	
 	//Dilate
-	Image<byte> dilated = morphology(thresholded, getDisc(*radius), Morphology::BinaryDilate<byte>());
+	Image<CVD::byte> dilated = morphology(thresholded, getDisc(*radius), Morphology::BinaryDilate<CVD::byte>());
 
 	transform(dilated.begin(), dilated.end(), dilated.begin(), bind1st(multiplies<int>(), 255));
 	

@@ -7,9 +7,9 @@
 @returns scaled image
 @ingroup gDebug
 */
-Image<byte> scale_to_bytes(const Image<float>& im, float lo, float hi)
+Image<CVD::byte> scale_to_bytes(const Image<float>& im, float lo, float hi)
 {
-	Image<byte> out(im.size());
+	Image<CVD::byte> out(im.size());
 	for(int r=0; r < out.size().y-0; r++)
 		for(int c=0; c < out.size().x-0; c++)
 			out[r][c] = (int)floor((im[r][c]-lo)*255/(hi-lo));

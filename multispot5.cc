@@ -126,9 +126,9 @@ vector<Vector<4> > spots_to_vector(const Vector<>& s)
 
 ///Normalize an image for display purposes.
 ///@ingroup gUtility
-Image<byte> scale_to_bytes(const Image<float>& im, float lo, float hi)
+Image<CVD::byte> scale_to_bytes(const Image<float>& im, float lo, float hi)
 {
-        Image<byte> out(im.size());
+        Image<CVD::byte> out(im.size());
         for(int r=0; r < out.size().y-0; r++)
                 for(int c=0; c < out.size().x-0; c++)
                         out[r][c] = (int)floor((im[r][c]-lo)*255/(hi-lo));
@@ -137,11 +137,11 @@ Image<byte> scale_to_bytes(const Image<float>& im, float lo, float hi)
 
 ///Normalize an image for display purposes.
 ///@ingroup gUtility
-Image<byte> scale_to_bytes(const Image<float>& im)
+Image<CVD::byte> scale_to_bytes(const Image<float>& im)
 {
         float lo = *min_element(im.begin(), im.end());
         float hi = *max_element(im.begin(), im.end());
-        Image<byte> out(im.size());
+        Image<CVD::byte> out(im.size());
         for(int r=0; r < out.size().y-0; r++)
                 for(int c=0; c < out.size().x-0; c++)
                         out[r][c] = (int)floor((im[r][c]-lo)*255/(hi-lo));
@@ -1217,13 +1217,13 @@ StateParameters generate_state_parameters_ye_olde(const BasicImage<double>& log_
 	const double post_dilate_radius = GV3::get<double>("post_dilate.radius", 0, -1);
 	if(post_dilate_radius != 0)
 	{
-		Image<byte> pix(ims[0].size());
+		Image<CVD::byte> pix(ims[0].size());
 		pix.fill(0);
 		
 		for(unsigned int i=0; i < pixels.size(); i++)
 			pix[pixels[i]] = 255;
 
-		Image<byte> dilated = morphology(pix, getDisc(post_dilate_radius), Morphology::BinaryDilate<byte>());
+		Image<CVD::byte> dilated = morphology(pix, getDisc(post_dilate_radius), Morphology::BinaryDilate<CVD::byte>());
 
 		pixels.clear();
 

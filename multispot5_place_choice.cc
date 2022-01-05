@@ -38,12 +38,12 @@ void place_and_fit_spots(const vector<Image<float> >& ims, const vector<ImageRef
 
 		if(dilate_mask_radius != 0)
 		{
-			Image<byte> filter(ims[0].size());
+			Image<CVD::byte> filter(ims[0].size());
 			filter.fill(0);
 			for(unsigned int i=0; i < region.size(); i++)
 				filter[region[i]]=1;
 
-			Image<byte> dilated = morphology(filter, getDisc(dilate_mask_radius), Morphology::BinaryDilate<byte>());
+			Image<CVD::byte> dilated = morphology(filter, getDisc(dilate_mask_radius), Morphology::BinaryDilate<CVD::byte>());
 
 			for(int r=0; r < dilated.size().y; r++)
 				for(int c=0; c < dilated.size().x; c++)
