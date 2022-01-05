@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cvd/morphology.h>
 #include <cvd/draw.h>
+#include <cvd/byte.h>
 
 using namespace std;
 using namespace CVD;

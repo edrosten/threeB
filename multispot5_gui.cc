@@ -15,6 +15,7 @@
 #include <cvd/gl_helpers.h>
 #include <cvd/vector_image_ref.h>
 #include <cvd/videodisplay.h>
+#include <cvd/byte.h>
 
 #include <gvars3/instances.h>
 #include <gvars3/GStringUtil.h>

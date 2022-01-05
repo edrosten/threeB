@@ -13,6 +13,7 @@
 #include <cvd/connected_components.h>
 #include <cvd/draw.h>
 #include <cvd/vector_image_ref.h>
+#include <cvd/byte.h>
 
 // #include <cvd/random.h>
 #include <cvd/timer.h>

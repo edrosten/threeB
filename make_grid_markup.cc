@@ -1,6 +1,7 @@
 #include <cvd/image_io.h>
 #include <cvd/draw.h>
 #include <cvd/morphology.h>
+#include <cvd/byte.h>
 #include <gvars3/instances.h>
 #include <tag/printf.h>
 #include <climits>

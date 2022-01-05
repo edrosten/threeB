@@ -12,6 +12,7 @@
 #include <cvd/morphology.h>
 #include <cvd/vector_image_ref.h>
 #include <cvd/gl_helpers.h>
+#include <cvd/byte.h>
 
 #include <TooN/TooN.h>
 

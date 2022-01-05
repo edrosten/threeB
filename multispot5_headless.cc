@@ -12,6 +12,7 @@
 #include <cvd/connected_components.h>
 #include <cvd/draw.h>
 #include <cvd/vector_image_ref.h>
+#include <cvd/byte.h>
 
 #include <gvars3/instances.h>
 

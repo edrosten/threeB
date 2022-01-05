@@ -1,3 +1,4 @@
+#include <cvd/byte.h>
 
 /** Scales an image in to the correct range for bytes.
 @param hi Brightest pixel in the image 
