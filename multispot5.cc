@@ -14,7 +14,7 @@
 #include <cvd/draw.h>
 #include <cvd/vector_image_ref.h>
 
-#include <cvd/random.h>
+// #include <cvd/random.h>
 #include <cvd/timer.h>
 #include <gvars3/instances.h>
 
