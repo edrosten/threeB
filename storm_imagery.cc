@@ -25,12 +25,13 @@ vector<Image<float> > load_and_preprocess_images2(const vector<string>& names)
 	//Load images
 	for(unsigned int i=0; i < names.size(); i++)
 	{
-		Image<float> im = img_load(names[i]);
+		std::string name = names[i];
+		Image<float> im = img_load(name);
 		ims.push_back(im);
 
 		if(ims.back().size() != ims[0].size())
 		{
-			cerr << "Error with image " << names[i] << ":  all images must be the same size!\n";
+			cerr << "Error with image " << name << ":  all images must be the same size!\n";
 			exit(1);
 		}
 	}
@@ -177,13 +178,14 @@ vector<Image<float> > load_and_preprocess_images(const vector<string>& names)
 	
 	for(unsigned int i=0; i < names.size(); i++)
 	{
-		Image<float> im = img_load(names[i]);
+		std::string name = names[i];
+		Image<float> im = img_load(name);
 	
 		ims.push_back(preprocess_image(im));
 	
 		if(ims.back().size() != ims[0].size())
 		{
-			cerr << "Error with image " << names[i] << ":  all images must be the same size!\n";
+			cerr << "Error with image " << name << ":  all images must be the same size!\n";
 			exit(1);
 		}
 	}
