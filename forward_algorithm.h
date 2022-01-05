@@ -1,7 +1,7 @@
 #ifndef FORWARD_ALGORITHM_H
 #define FORWARD_ALGORITHM_H
-#include <tr1/tuple>
-#include <tr1/array>
+#include <tuple>
+#include <array>
 #include <TooN/TooN.h>
 #include <vector>
 #include <cmath>
@@ -131,11 +131,10 @@ The derivatives and Hessian recursion are therefore:
 @param compute_hessian Whether to compute the Hessian, or return zero. This implies \c compute_deriv.
 @returns the log probability of observing all the data, and the derivatives of the log probability with respect to the parameters, and the Hessian.
 */
-template<int States, class Btype, class Otype> std::tr1::tuple<double, TooN::Vector<Btype::NumParameters>, TooN::Matrix<Btype::NumParameters> > forward_algorithm_hessian(TooN::Matrix<States> A, TooN::Vector<States> pi, const Btype& B, const std::vector<Otype>& O, bool compute_deriv=1, bool compute_hessian=1)
+template<int States, class Btype, class Otype> std::tuple<double, TooN::Vector<Btype::NumParameters>, TooN::Matrix<Btype::NumParameters> > forward_algorithm_hessian(TooN::Matrix<States> A, TooN::Vector<States> pi, const Btype& B, const std::vector<Otype>& O, bool compute_deriv=1, bool compute_hessian=1)
 {
 	using namespace TooN;
 	using namespace std;
-	using namespace std::tr1;
 
 	if(compute_hessian == 1)
 		compute_deriv=1;
@@ -245,7 +244,6 @@ template<int States, class Btype, class Otype> double forward_algorithm(TooN::Ma
 {
 	using namespace TooN;
 	using namespace std;
-	using namespace std::tr1;
 
 	int states = pi.size();
 	
@@ -301,7 +299,7 @@ Run the forward algorithm and return the log probability and its derivatives.
 */
 template<int States, class Btype, class Otype> std::pair<double, TooN::Vector<Btype::NumParameters> > forward_algorithm_deriv(TooN::Matrix<States> A, TooN::Vector<States> pi, const Btype& B, const std::vector<Otype>& O)
 {
-	using namespace std::tr1;
+	using namespace std;
 	double p;
 	TooN::Vector<Btype::NumParameters> v;
 	tie(p,v, ignore) = forward_algorithm_hessian(A, pi, B, O, 1, 0);
@@ -319,12 +317,11 @@ Run the forward algorithm and return the log partials (delta)
 @returns the log probability of observing all the data.
 */
 template<int States, class Btype, class Otype> 
-std::vector<std::tr1::array<double, States> >
+std::vector<std::array<double, States> >
 forward_algorithm_delta(TooN::Matrix<States> A, TooN::Vector<States> pi, const Btype& B, const std::vector<Otype>& O)
 {
 	using namespace TooN;
 	using namespace std;
-	using namespace std::tr1;
 
 	int states = pi.size();
 	
@@ -368,11 +365,10 @@ Run the forward algorithm and return the log partials (delta)
 @param delta the \f$\delta\f$ values
 */
 template<int States, class Btype, class Otype> 
-void forward_algorithm_delta2(TooN::Matrix<States> A, TooN::Vector<States> pi, const Btype& B, const std::vector<Otype>& O, std::vector<std::tr1::array<double, States> >& delta)
+void forward_algorithm_delta2(TooN::Matrix<States> A, TooN::Vector<States> pi, const Btype& B, const std::vector<Otype>& O, std::vector<std::array<double, States> >& delta)
 {
 	using namespace TooN;
 	using namespace std;
-	using namespace std::tr1;
 
 	int states = pi.size();
 	
@@ -420,12 +416,11 @@ Run the forward-backwards algorithm and return the log partials (delta and epsil
 @returns the log probability of observing all the data.
 */
 template<int States, class Btype, class Otype> 
-std::pair<std::vector<std::tr1::array<double, States> >,  std::vector<std::tr1::array<double, States> > >
+std::pair<std::vector<std::array<double, States> >,  std::vector<std::array<double, States> > >
 forward_backward_algorithm(TooN::Matrix<States> A, TooN::Vector<States> pi, const Btype& B, const std::vector<Otype>& O)
 {
 	using namespace TooN;
 	using namespace std;
-	using namespace std::tr1;
 
 	int states = pi.size();
 	
@@ -494,7 +489,7 @@ template<class A, class Rng> int select_random_element(const A& v, const double 
 ///@param a Uscaled probability distribution, stored as logarithms.
 ///@param rng Random number generator to use
 ///@ingroup gHMM
-template<int N, class Rng> int sample_unscaled_log(std::tr1::array<double, N> a, Rng& rng)
+template<int N, class Rng> int sample_unscaled_log(std::array<double, N> a, Rng& rng)
 {
 	double hi = *max_element(a.begin(), a.end());
 	double sum=0;
@@ -516,7 +511,7 @@ template<int N, class Rng> int sample_unscaled_log(std::tr1::array<double, N> a,
 ///@returns state at each time step.
 ///@ingroup gHMM
 template<int States, class StateType, class Rng>
-std::vector<StateType> backward_sampling(TooN::Matrix<States> A, const std::vector<std::tr1::array<double, States> >& delta, Rng& rng)
+std::vector<StateType> backward_sampling(TooN::Matrix<States> A, const std::vector<std::array<double, States> >& delta, Rng& rng)
 {
 	//Compute the elementwise log of A
 	for(int r=0; r < A.num_rows(); r++)
@@ -531,7 +526,7 @@ std::vector<StateType> backward_sampling(TooN::Matrix<States> A, const std::vect
 
 	for(int i=delta.size()-2; i >= 0; i--)
 	{
-		std::tr1::array<double, States> reverse_probabilities = delta[i];
+		std::array<double, States> reverse_probabilities = delta[i];
 
 		for(int j=0; j < States; j++)
 			reverse_probabilities[j] += A[j][samples[i+1]];
@@ -543,7 +538,7 @@ std::vector<StateType> backward_sampling(TooN::Matrix<States> A, const std::vect
 }
 /*
 template<int States, class StateType>
-std::vector<StateType> backward_sampling(const TooN::Matrix<States> &A, const std::vector<std::tr1::array<double, States> >& delta)
+std::vector<StateType> backward_sampling(const TooN::Matrix<States> &A, const std::vector<std::array<double, States> >& delta)
 {
 	RngDrand48 d;
 	return backward_sampling<States, StateType, RngDrand48>(A, delta, d);
@@ -551,7 +546,7 @@ std::vector<StateType> backward_sampling(const TooN::Matrix<States> &A, const st
 
 ///@overload
 template<int States>
-std::vector<int> backward_sampling(const TooN::Matrix<States>& A, const std::vector<std::tr1::array<double, States> >& delta)
+std::vector<int> backward_sampling(const TooN::Matrix<States>& A, const std::vector<std::array<double, States> >& delta)
 {
 	RngDrand48 d;
 	return backward_sampling<States, int, RngDrand48>(A, delta, d);

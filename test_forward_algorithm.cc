@@ -1,5 +1,5 @@
-#include <tr1/array>
-#include <tr1/tuple>
+#include <array>
+#include <tuple>
 #include <TooN/TooN.h>
 #include <algorithm>
 #include <iostream>
@@ -18,7 +18,6 @@
 using namespace std;
 using namespace CVD;
 using namespace tag;
-using namespace std::tr1;
 using namespace TooN;
 
 ///Observer which is the same as in hmm_test.cc

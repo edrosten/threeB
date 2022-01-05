@@ -1,7 +1,7 @@
 #include <tag/printf.h>
 #undef make_tuple
 
-#include <tr1/tuple>
+#include <tuple>
 #include <algorithm>
 #include <climits>
 #include <iomanip>
@@ -27,7 +27,6 @@
 #include "utility.h"
 
 using namespace std;
-using namespace std::tr1;
 using namespace CVD;
 using namespace GVars3;
 using namespace TooN;

@@ -2,7 +2,7 @@
 #include <cvd/image_io.h>
 #include <cvd/convolution.h>
 #include <TooN/wls.h>
-#include <tr1/tuple>
+#include <tuple>
 
 #include "storm_imagery.h"
 #include "debug.h"
@@ -12,7 +12,6 @@ using namespace CVD;
 using namespace TooN;
 using namespace GVars3;
 using namespace std;
-using namespace std::tr1;
 
 /**Load all images from disk and do the initial preprocessing. 
 

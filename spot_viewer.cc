@@ -23,7 +23,7 @@
 #include <tag/printf.h>
 #undef make_tuple
 
-#include <tr1/tuple>
+#include <tuple>
 
 #include "cxxgplot.h"
 #include "debug.h"
@@ -33,7 +33,6 @@ using namespace CVD;
 using namespace TooN;
 using namespace GVars3;
 using namespace std;
-using namespace std::tr1;
 
 map<string, map<string, string> > watch;
 

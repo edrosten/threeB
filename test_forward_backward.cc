@@ -1,5 +1,5 @@
-#include <tr1/array>
-#include <tr1/tuple>
+#include <array>
+#include <tuple>
 #include <TooN/TooN.h>
 #include <algorithm>
 #include <numeric>
@@ -19,7 +19,6 @@
 using namespace std;
 using namespace CVD;
 using namespace tag;
-using namespace std::tr1;
 using namespace TooN;
 
 template<class C> double sumarray(const C& in)

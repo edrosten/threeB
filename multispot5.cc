@@ -6,7 +6,7 @@
 #include <climits>
 #include <iomanip>
 #include <map>
-#include <tr1/memory>
+#include <memory>
 #include <cvd/image_io.h>
 #include <cvd/image_convert.h>
 #include <cvd/morphology.h>
@@ -47,7 +47,6 @@ using namespace std;
 using namespace CVD;
 using namespace GVars3;
 using namespace TooN;
-using namespace std::tr1;
 
 ///Empty destructor
 UserInterfaceCallback::~UserInterfaceCallback(){}
