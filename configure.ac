@@ -232,7 +232,11 @@ then
 	AC_LINK_IFELSE([AC_LANG_SOURCE([
 		#include <cvd/fast_corner.h>
 		#include <cvd/image_io.h>
-		int main(){ CVD::Image<CVD::byte> i = CVD::img_load(""); return 0;}
+		int main(){
+		const char *s = "";
+		std::string str(s);
+		CVD::Image<CVD::byte> i = CVD::img_load(str); return 0;
+		}
 	])], [cvd=yes], [cvd=no])
 	AC_MSG_RESULT([$cvd])
 fi
@@ -246,7 +250,11 @@ then
 	AC_LINK_IFELSE([AC_LANG_SOURCE([
 		#include <cvd/fast_corner.h>
 		#include <cvd/image_io.h>
-		int main(){ CVD::Image<CVD::byte> i = CVD::img_load(""); return 0;}
+		int main(){
+		const char *s = "";
+		std::string str(s);
+		CVD::Image<CVD::byte> i = CVD::img_load(str); return 0;
+		}
 	])], [cvd=yes], [cvd=no])
 	AC_MSG_RESULT($cvd)
 fi
