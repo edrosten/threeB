@@ -308,7 +308,7 @@ then
 	AC_SUBST(CLASSPATH, [$with_imagej])
 fi
 
-java=/usr/lib/jvm/java-6-openjdk/include/
+java=/usr/lib/jvm/default-java/include/
 
 AC_ARG_WITH(jni, AC_HELP_STRING(--with-jni=/path/to/jni, [specify location of JNI headers]))
 
@@ -318,7 +318,7 @@ if test "$with_jni" != ""
 then
 	javas="$with_jni"
 else
-	jvm="$(readlink -f `which java`  | sed -e's!jre/bin/java!include!')"
+	jvm="$(readlink -f `which java`  | sed -e's!bin/java!include!')"
 	javas="$jvm /usr/lib/jvm/java-7-openjdk/include/ /usr/lib/jvm/java-6-openjdk/include/"
 fi
 
