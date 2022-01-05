@@ -118,7 +118,7 @@ void mmain(int argc, char** argv)
 		{
 			log_ratios = img_load(GV3::get<string>("log_ratios", "", -1));
 		}
-		catch(Exceptions::All e)
+		catch(LogFileParseError e)
 		{
 			cerr << "Error loading " << GV3::get<string>("log_ratios", "") << ": " << e.what << endl;
 			exit(1);
@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 	try{
 		mmain(argc, argv);
 	}
-	catch(Exceptions::All e)
+	catch(LogFileParseError e)
 	{
 		cerr << "Fatal error: " << e.what << endl;
 	}

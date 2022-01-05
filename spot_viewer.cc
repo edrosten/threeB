@@ -1782,7 +1782,7 @@ int main(int argc, char** argv)
 			try{
 				img_save(buf, sPrintf("screenshot-%03i.png", GV3::get<int>("grabno", 0, 1)++));
 			}
-			catch(Exceptions::All e)
+			catch(LogFileParseError e)
 			{
 				cerr << "Error: " << e.what << endl;
 			}
