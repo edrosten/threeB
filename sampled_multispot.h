@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <cvd/image_ref.h>
-#include <tr1/tuple>
+#include <tuple>
 #include <TooN/TooN.h>
 
 #include "drift.h"
@@ -16,7 +16,6 @@ namespace SampledMultispot
 using namespace std;
 using namespace CVD;
 using namespace TooN;
-using namespace std::tr1;
 
 
 

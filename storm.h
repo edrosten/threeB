@@ -4,7 +4,7 @@
 #include <TooN/TooN.h>
 #include <cvd/image.h>
 #include <utility>
-#include <tr1/tuple>
+#include <tuple>
 #include "utility.h"
 
 
@@ -46,10 +46,10 @@ template<class B> std::pair<double, TooN::Vector<4> > spot_shape_diff_position(c
 @param phi \f$\Vec{\phi}\f$
 @ingroup gStorm
 */
-template<class B> std::tr1::tuple<double, TooN::Vector<4>, TooN::Matrix<4> > spot_shape_hess_position(const TooN::Vector<2>& x, const TooN::Vector<4, double, B>& phi)
+template<class B> std::tuple<double, TooN::Vector<4>, TooN::Matrix<4> > spot_shape_hess_position(const TooN::Vector<2>& x, const TooN::Vector<4, double, B>& phi)
 {
 	using namespace TooN;
-	using namespace std::tr1;
+	using namespace std;
 
 	double s = spot_shape_s(x, phi);
 	double r_2_pi = sqrt(2*M_PI);
@@ -121,7 +121,7 @@ And the hessian is:
 @return \f$\mu(\Vec{x}, \Vec{\phi}) \f$
 @ingroup gStorm
 */
-template<class B> std::tr1::tuple<double, TooN::Vector<2>, TooN::Matrix<2> > spot_shape_hess(const TooN::Vector<2>& x, const TooN::Vector<4, double, B>& phi)
+template<class B> std::tuple<double, TooN::Vector<2>, TooN::Matrix<2> > spot_shape_hess(const TooN::Vector<2>& x, const TooN::Vector<4, double, B>& phi)
 {
 	double s = spot_shape_s(x, phi);
 	double r_2_pi = sqrt(2*M_PI);
@@ -135,7 +135,7 @@ template<class B> std::tr1::tuple<double, TooN::Vector<2>, TooN::Matrix<2> > spo
 	hess[1][0] = hess[0][1];
 	hess[1][1] = 2*phi[0]*exp(s)*(1 + 5*s + 2*s*s) / ( pow(phi[1], 3) * r_2_pi);
 
-	return std::tr1::make_tuple(prob, deriv, hess);
+	return std::make_tuple(prob, deriv, hess);
 }
 /** see spot_shape_hess()
 @param x \f$\Vec{x}\f$
@@ -214,10 +214,10 @@ The derivatives are:
 @param spot_parameters \f$\Vec{\phi}\f$
 @returns The log probability
 */
-template<class Base> std::tr1::tuple<double, TooN::Vector<2>, TooN::Matrix<2> > log_probability_spot_hess(const CVD::SubImage<float>& im, double variance, const TooN::Vector<4, double, Base>& spot_parameters)
+template<class Base> std::tuple<double, TooN::Vector<2>, TooN::Matrix<2> > log_probability_spot_hess(const CVD::SubImage<float>& im, double variance, const TooN::Vector<4, double, Base>& spot_parameters)
 {
 	using namespace TooN;
-	using namespace std::tr1;
+	using namespace std;
 
 	//-1 because if the image is 3x3, ie 0,1,2 then 1,1 is the centre.
 	//If it is 2x2, ie 0,1 then .5,.5 is the centre
@@ -257,7 +257,6 @@ template<class Base> std::tr1::tuple<double, TooN::Vector<2>, TooN::Matrix<2> > 
 template<class Base> std::pair<double, TooN::Vector<2> > log_probability_spot_diff(const CVD::SubImage<float>& im, double variance, const TooN::Vector<4, double, Base>& spot_parameters)
 {
 	using namespace TooN;
-	using namespace std::tr1;
 	using namespace std;
 	//-1 because if the image is 3x3, ie 0,1,2 then 1,1 is the centre.
 	//If it is 2x2, ie 0,1 then .5,.5 is the centre

@@ -1,4 +1,4 @@
-#include <tr1/array>
+#include <array>
 #include <TooN/TooN.h>
 #include <vector>
 #include <cmath>
@@ -10,7 +10,6 @@ template<int States, class Btype, class Otype> void forward_backward_sample(TooN
 {
 	using namespace TooN;
 	using namespace std;
-	using namespace std::tr1;
 
 	static const int M = Btype::NumParameters;
 	int states = pi.size();

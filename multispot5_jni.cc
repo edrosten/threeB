@@ -12,7 +12,7 @@
 
 #include <tag/printf.h>
 #undef make_tuple
-#include <tr1/tuple>
+#include <tuple>
 
 #ifdef DEBUG
 	#include <cvd/image_io.h>
@@ -23,7 +23,6 @@
 
 
 using namespace std;
-using namespace std::tr1;
 using namespace CVD;
 using namespace GVars3;
 using namespace tag;

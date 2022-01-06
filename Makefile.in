@@ -1,6 +1,6 @@
 CXX=@CXX@
 CC=@CC@
-CXXFLAGS=@CXXFLAGS@ -I "@JAVAPATH@" -I "@JAVAPATH@/win32" -I.
+CXXFLAGS=@CXXFLAGS@ -I "@JAVAPATH@" -I "@JAVAPATH@/linux" -I "@JAVAPATH@/win32" -I.
 LDLIBS=@LIBS@
 LDFLAGS=@LDFLAGS@
 CLASSPATH+=@CLASSPATH@
@@ -87,11 +87,10 @@ libthreeB_jni.so:multispot5_jni.o $(basic_objs)
 three_B.jar: three_B.class  jar/plugins.config jar/multispot5.cfg LoadTestData.class ThreeBHelp.class ClassicGlow.class ThreeBLoader.class QuickPalmLoader.class
 	jar cvfM three_B.jar -C jar/ .
 
-%.class: %.java
-	javac -classpath $(CLASSPATH):jar/ -d jar $<
-
 ThreeBRunner.h: three_B.class
-	javah -classpath jar ThreeBRunner
+
+%.class: %.java
+	javac -h . -classpath $(CLASSPATH):jar/ -d jar $<
 
 
 # make -nB | awk '{for(i=1;i<=NF; i++)if($(i)~/\.(cc)|(cpp)$/)print $(i)}' | xargs makedepend -f - 2> /dev/null | awk '!/usr/ && !/#/{for(i=2; i <= NF; i++)a[$1] = a[$1] " " $(i)}END{for(i in a)print i, a[i]}' >> Makefile.in

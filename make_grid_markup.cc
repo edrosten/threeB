@@ -1,6 +1,7 @@
 #include <cvd/image_io.h>
 #include <cvd/draw.h>
 #include <cvd/morphology.h>
+#include <cvd/byte.h>
 #include <gvars3/instances.h>
 #include <tag/printf.h>
 #include <climits>
@@ -17,13 +18,13 @@ int main(int argc, char** argv)
 	float dilate = 0;
 	int size = GV3::get<int>("size", 0, -1);
 
-	Image<byte> im = img_load(GV3::get<string>("image"));
+	Image<CVD::byte> im = img_load(GV3::get<string>("image"));
 
 	int d = ceil(dilate);
 
 	vector<ImageRef> disc = getDisc(dilate);
 
-	Image<byte> mask(im.size()), filter(im.size()), final(im.size());
+	Image<CVD::byte> mask(im.size()), filter(im.size()), final(im.size());
 
 	final.zero();
 	int n=0;

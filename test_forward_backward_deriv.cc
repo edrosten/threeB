@@ -1,5 +1,5 @@
-#include <tr1/array>
-#include <tr1/tuple>
+#include <array>
+#include <tuple>
 #include <TooN/TooN.h>
 #include <TooN/functions/derivatives.h>
 #include <algorithm>
@@ -22,7 +22,6 @@
 using namespace std;
 using namespace CVD;
 using namespace tag;
-using namespace std::tr1;
 using namespace TooN;
 
 

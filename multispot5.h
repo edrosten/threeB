@@ -4,7 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <tr1/memory>
+#include <memory>
 #include <cvd/image.h>
 #include <cvd/byte.h>
 #include <TooN/TooN.h>
@@ -113,7 +113,7 @@ struct LogFileParseError
 ///Internal state (excluding fixed settings) which represents the entire
 ///internal state of spot fitting. Used to restart from interruptions.
 struct StateParameters{
-	std::tr1::shared_ptr<MT19937> rng;    ///< Random number generator state
+	std::shared_ptr<MT19937> rng;    ///< Random number generator state
 	std::vector<TooN::Vector<4> > spots;  ///< Spots positions 
 	int pass;                             ///< Pass number
 	int iteration;                        ///< Iteration number

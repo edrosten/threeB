@@ -3,7 +3,7 @@
 
 #include <climits>
 #include <algorithm>
-#include <tr1/tuple>
+#include <tuple>
 #include <cvd/image.h>
 #include <cvd/vector_image_ref.h>
 #include <cvd/byte.h>
@@ -19,7 +19,6 @@ using namespace std;
 using namespace CVD;
 using namespace GVars3;
 using namespace TooN;
-using namespace std::tr1;
 
 
 tuple<StateParameters, double, double> static get_defaults(const vector<ImageRef>& pixels)

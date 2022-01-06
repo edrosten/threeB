@@ -38,7 +38,11 @@ Image<float> preprocess_image(const Image<float>& im)
 		return f;
 	}
 	else
-		return im.copy_from_me();
+	{
+		Image<float> result;
+		result.copy_from(im);
+		return result;
+	}
 }
 
 /**Find the mean and variance of a stack of images

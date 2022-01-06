@@ -1,7 +1,7 @@
 #include <tag/printf.h>
 #undef make_tuple
 
-#include <tr1/tuple>
+#include <tuple>
 #include <algorithm>
 #include <climits>
 #include <iomanip>
@@ -12,6 +12,7 @@
 #include <cvd/connected_components.h>
 #include <cvd/draw.h>
 #include <cvd/vector_image_ref.h>
+#include <cvd/byte.h>
 
 #include <gvars3/instances.h>
 
@@ -21,7 +22,6 @@
 #include "utility.h"
 
 using namespace std;
-using namespace std::tr1;
 using namespace CVD;
 using namespace GVars3;
 using namespace TooN;
@@ -38,13 +38,13 @@ vector<vector<ImageRef> > get_regions(const SubImage<double>& log_ratios)
 
 
 	//Threshold image
-	Image<byte> thresholded(log_ratios.size(), 0);
+	Image<CVD::byte> thresholded(log_ratios.size(), 0);
 	for(int r=0; r < thresholded.size().y; r++)
 		for(int c=0; c < thresholded.size().x; c++)
 			thresholded[r][c] = 255 * (log_ratios[r][c] > threshold);
 	
 	//Dilate
-	Image<byte> dilated = morphology(thresholded, getDisc(*radius), Morphology::BinaryDilate<byte>());
+	Image<CVD::byte> dilated = morphology(thresholded, getDisc(*radius), Morphology::BinaryDilate<CVD::byte>());
 
 	transform(dilated.begin(), dilated.end(), dilated.begin(), bind1st(multiplies<int>(), 255));
 	
@@ -117,7 +117,7 @@ void mmain(int argc, char** argv)
 		{
 			log_ratios = img_load(GV3::get<string>("log_ratios", "", -1));
 		}
-		catch(Exceptions::All e)
+		catch(LogFileParseError e)
 		{
 			cerr << "Error loading " << GV3::get<string>("log_ratios", "") << ": " << e.what << endl;
 			exit(1);
@@ -163,7 +163,7 @@ int main(int argc, char** argv)
 	try{
 		mmain(argc, argv);
 	}
-	catch(Exceptions::All e)
+	catch(LogFileParseError e)
 	{
 		cerr << "Fatal error: " << e.what << endl;
 	}
